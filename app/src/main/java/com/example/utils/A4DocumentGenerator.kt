@@ -146,19 +146,23 @@ object A4DocumentGenerator {
     ) {
         val numRows = 4
 
-        val hMargin = if (showHorizontalMargin) 80f else 0f
+        // CR80 ID Card physical dimensions: 85.6 mm x 53.98 mm
+        val cardWidthMm = 85.6f
+        val cardHeightMm = 53.98f
+
+        val cardW = cardWidthMm * MM_TO_PX
+        val cardH = cardHeightMm * MM_TO_PX
+
         val hGap = if (showHorizontalMargin) 40f else 0f
-        val totalAvailableW = A4_WIDTH_PX.toFloat() - (hMargin * 2f) - hGap
-        val cardW = totalAvailableW / 2f
+        val totalGridW = (cardW * 2f) + hGap
+        val startX = if (showHorizontalMargin) {
+            80f
+        } else {
+            ((A4_WIDTH_PX.toFloat() - totalGridW) / 2f).coerceAtLeast(0f)
+        }
 
-        val vMargin = if (showVerticalMargin) 80f else 0f
+        val startY = if (showVerticalMargin) 80f else 60f
         val vGap = if (showVerticalMargin) 40f else 0f
-        val totalVSpace = (vMargin * 2f) + (vGap * (numRows - 1))
-        val availableH = A4_HEIGHT_PX.toFloat() - totalVSpace
-        val cardH = availableH / numRows
-
-        val startX = hMargin
-        val startY = vMargin
 
         val rowPairs = listOf(
             Pair(panFront, rotateBitmap180(voterBack)),
