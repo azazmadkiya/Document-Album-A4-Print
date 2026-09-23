@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Safe area is centered at (54,54), 66dp circle (radius 33 from x=21..87, y=21..87) -->
+
+    <!-- Ambient Shadow for A4 Sheet -->
+    <path
+        android:fillColor="#40000000"
+        android:pathData="M32,23 h44 c2.8,0 5,2.2 5,5 v54 c0,2.8 -2.2,5 -5,5 h-44 c-2.8,0 -5,-2.2 -5,-5 v-54 c0,-2.8 2.2,-5 5,-5 z" />
+
+    <!-- A4 Document Sheet (Clean Pristine White Plate) -->
+    <path
+        android:fillColor="#F8FAFC"
+        android:pathData="M31,21 h44 c2.5,0 4.5,2 4.5,4.5 v54 c0,2.5 -2,4.5 -4.5,4.5 h-44 c-2.5,0 -4.5,-2 -4.5,-4.5 v-54 c0,-2.5 2,-4.5 4.5,-4.5 z" />
+
+    <!-- Sheet Header Line -->
+    <path
+        android:fillColor="#CBD5E1"
+        android:pathData="M36,25 h18 v2 h-18 z" />
+
+    <!-- ================= CARD 1: FRONT SIDE (Electric Indigo/Blue) ================= -->
+    <!-- Card 1 Shadow -->
+    <path
+        android:fillColor="#25000000"
+        android:pathData="M35,32 h36 c1.8,0 3,1.2 3,3 v16 c0,1.8 -1.2,3 -3,3 h-36 c-1.8,0 -3,-1.2 -3,-3 v-16 c0,-1.8 1.2,-3 3,-3 z" />
+
+    <!-- Card 1 Body -->
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M34,30 h36 c1.8,0 3,1.2 3,3 v16 c0,1.8 -1.2,3 -3,3 h-36 c-1.8,0 -3,-1.2 -3,-3 v-16 c0,-1.8 1.2,-3 3,-3 z" />
+
+    <!-- Card 1 Top Strip Accent -->
+    <path
+        android:fillColor="#1D4ED8"
+        android:pathData="M34,30 h36 c1.8,0 3,1.2 3,3 v3 h-42 v-3 c0,-1.8 1.2,-3 3,-3 z" />
+
+    <!-- Card 1 Photo Frame -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,38 h7 c0.6,0 1,0.4 1,1 v7 c0,0.6 -0.4,1 -1,1 h-7 c-0.6,0 -1,-0.4 -1,-1 v-7 c0,-0.6 0.4,-1 1,-1 z" />
+    <!-- Photo Avatar Silhouette -->
+    <path
+        android:fillColor="#3B82F6"
+        android:pathData="M41.5,41.5 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 M39,45.5 c0,-1.2 1.2,-2 2.5,-2 s2.5,0.8 2.5,2 z" />
+
+    <!-- Card 1 Details Lines -->
+    <path
+        android:fillColor="#DBEAFE"
+        android:pathData="M48,39 h18 v1.8 h-18 z M48,42.5 h14 v1.5 h-14 z M48,45.5 h10 v1.5 h-10 z" />
+
+    <!-- Card 1 Hologram / Chip Icon -->
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M66,45 h3 v3 h-3 z" />
+
+    <!-- ================= CARD 2: BACK SIDE (Cyan/Teal Gradient Tone) ================= -->
+    <!-- Card 2 Shadow -->
+    <path
+        android:fillColor="#25000000"
+        android:pathData="M35,55 h36 c1.8,0 3,1.2 3,3 v16 c0,1.8 -1.2,3 -3,3 h-36 c-1.8,0 -3,-1.2 -3,-3 v-16 c0,-1.8 1.2,-3 3,-3 z" />
+
+    <!-- Card 2 Body -->
+    <path
+        android:fillColor="#0D9488"
+        android:pathData="M34,53 h36 c1.8,0 3,1.2 3,3 v16 c0,1.8 -1.2,3 -3,3 h-36 c-1.8,0 -3,-1.2 -3,-3 v-16 c0,-1.8 1.2,-3 3,-3 z" />
+
+    <!-- Card 2 Magnetic / Security Band -->
+    <path
+        android:fillColor="#115E59"
+        android:pathData="M31,56 h42 v3 h-42 z" />
+
+    <!-- Card 2 Barcode Representation -->
+    <path
+        android:fillColor="#CCFBF1"
+        android:pathData="M37,63 h3 v4.5 h-3 z M41.5,63 h1.5 v4.5 h-1.5 z M44.5,63 h2.5 v4.5 h-2.5 z M48.5,63 h1.5 v4.5 h-1.5 z" />
+
+    <!-- Card 2 Text Lines -->
+    <path
+        android:fillColor="#E6FFFA"
+        android:pathData="M53,63 h14 v1.5 h-14 z M53,66 h10 v1.2 h-10 z" />
+
+    <!-- ================= AUTO-CROP TARGET CORNERS (Electric Cyan) ================= -->
+    <!-- Top-Left Crop Marker -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M26,17 h6 v2 h-4 v4 h-2 z" />
+    <!-- Top-Right Crop Marker -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M78,17 h6 v6 h-2 v-4 h-4 z" />
+    <!-- Bottom-Left Crop Marker -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M26,83 h2 v-4 h4 v-2 h-6 z" />
+
+    <!-- ================= FLOATING PRINT/ALBUM BADGE (Bottom-Right) ================= -->
+    <!-- Badge Outer Glow -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M73,73 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" />
+
+    <!-- Badge Inner Border -->
+    <path
+        android:pathData="M73,73 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0"
+        android:strokeWidth="1.2"
+        android:strokeColor="#FEF3C7" />
+
+    <!-- Print Icon (Sharp & Bold) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M69,67 h8 v3 h-8 z M67.5,71 h11 c0.8,0 1.5,0.7 1.5,1.5 v4 c0,0.8 -0.7,1.5 -1.5,1.5 h-11 c-0.8,0 -1.5,-0.7 -1.5,-1.5 v-4 c0,-0.8 0.7,-1.5 1.5,-1.5 z M70,75.5 h6 v3 h-6 z" />
+
+    <!-- Paper Output Sheet from Printer -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M71,76.5 h4 v1 h-4 z" />
+
+</vector>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="140dp"
+    android:height="140dp"
+    android:viewportWidth="140"
+    android:viewportHeight="140">
+
+    <!-- Outer Circular Shield Base -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M70,70m-64,0a64,64 0 1,0 128,0 a64,64 0 1,0 -128,0" />
+
+    <!-- Gradient Ring / Accent Border -->
+    <path
+        android:pathData="M70,70m-62,0a62,62 0 1,0 124,0 a62,62 0 1,0 -124,0"
+        android:strokeWidth="2"
+        android:strokeColor="#3B82F6" />
+
+    <!-- Tech Grid Background -->
+    <path
+        android:pathData="M35,16 L35,124 M70,8 L70,132 M105,16 L105,124 M16,35 L124,35 M8,70 L132,70 M16,105 L124,105"
+        android:strokeWidth="0.5"
+        android:strokeColor="#1E3A8A" />
+
+    <!-- A4 Paper Sheet Ambient Shadow -->
+    <path
+        android:fillColor="#50000000"
+        android:pathData="M44,22 h52 c3.3,0 6,2.7 6,6 v84 c0,3.3 -2.7,6 -6,6 h-52 c-3.3,0 -6,-2.7 -6,-6 v-84 c0,-3.3 2.7,-6 6,-6 z" />
+
+    <!-- A4 Sheet Surface (Pure Clean White with Rounded Corners) -->
+    <path
+        android:fillColor="#F8FAFC"
+        android:pathData="M42,20 h52 c3,0 5.5,2.5 5.5,5.5 v84 c0,3 -2.5,5.5 -5.5,5.5 h-52 c-3,0 -5.5,-2.5 -5.5,-5.5 v-84 c0,-3 2.5,-5.5 5.5,-5.5 z" />
+
+    <!-- Top A4 Margin / Title Bar -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M48,26 h24 v3 h-24 z" />
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M84,26 h8 v3 h-8 z" />
+
+    <!-- ================= CARD 1: FRONT SIDE (Electric Indigo/Blue) ================= -->
+    <path
+        android:fillColor="#20000000"
+        android:pathData="M48,34 h44 c2,0 3.5,1.5 3.5,3.5 v24 c0,2 -1.5,3.5 -3.5,3.5 h-44 c-2,0 -3.5,-1.5 -3.5,-3.5 v-24 c0,-2 1.5,-3.5 3.5,-3.5 z" />
+
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M46,32 h44 c2,0 3.5,1.5 3.5,3.5 v24 c0,2 -1.5,3.5 -3.5,3.5 h-44 c-2,0 -3.5,-1.5 -3.5,-3.5 v-24 c0,-2 1.5,-3.5 3.5,-3.5 z" />
+
+    <path
+        android:fillColor="#1D4ED8"
+        android:pathData="M46,32 h44 c2,0 3.5,1.5 3.5,3.5 v5 h-51 v-5 c0,-2 1.5,-3.5 3.5,-3.5 z" />
+
+    <!-- Front Card Photo Area -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M51,43 h10 c0.8,0 1.5,0.7 1.5,1.5 v11 c0,0.8 -0.7,1.5 -1.5,1.5 h-10 c-0.8,0 -1.5,-0.7 -1.5,-1.5 v-11 c0,-0.8 0.7,-1.5 1.5,-1.5 z" />
+    <path
+        android:fillColor="#3B82F6"
+        android:pathData="M56,48.5 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0 M52.5,54.5 c0,-2 2,-3 3.5,-3 s3.5,1 3.5,3 z" />
+
+    <!-- Front Card Data Lines -->
+    <path
+        android:fillColor="#DBEAFE"
+        android:pathData="M65,43 h21 v2.5 h-21 z M65,48 h16 v2 h-16 z M65,52.5 h12 v2 h-12 z" />
+
+    <!-- Gold Chip Hologram -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M83,52 h4 v4 h-4 z" />
+
+    <!-- ================= CARD 2: BACK SIDE (Emerald/Teal) ================= -->
+    <path
+        android:fillColor="#20000000"
+        android:pathData="M48,68 h44 c2,0 3.5,1.5 3.5,3.5 v24 c0,2 -1.5,3.5 -3.5,3.5 h-44 c-2,0 -3.5,-1.5 -3.5,-3.5 v-24 c0,-2 1.5,-3.5 3.5,-3.5 z" />
+
+    <path
+        android:fillColor="#0D9488"
+        android:pathData="M46,66 h44 c2,0 3.5,1.5 3.5,3.5 v24 c0,2 -1.5,3.5 -3.5,3.5 h-44 c-2,0 -3.5,-1.5 -3.5,-3.5 v-24 c0,-2 1.5,-3.5 3.5,-3.5 z" />
+
+    <!-- Magnetic Band -->
+    <path
+        android:fillColor="#115E59"
+        android:pathData="M42,70 h51 v5 h-51 z" />
+
+    <!-- Barcode Stripes -->
+    <path
+        android:fillColor="#CCFBF1"
+        android:pathData="M50,80 h4 v7 h-4 z M56,80 h2 v7 h-2 z M60,80 h3 v7 h-3 z M65,80 h2 v7 h-2 z" />
+
+    <!-- Address/Back text lines -->
+    <path
+        android:fillColor="#E6FFFA"
+        android:pathData="M70,80 h17 v2.5 h-17 z M70,84.5 h12 v2 h-12 z" />
+
+    <!-- ================= SMART AUTO-CROP CORNERS (Neon Cyan) ================= -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M35,14 h8 v2.5 h-5.5 v5.5 h-2.5 z" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M97,14 h8 v8 h-2.5 v-5.5 h-5.5 z" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M35,116 h2.5 v-5.5 h5.5 v-2.5 h-8 z" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M105,116 h-8 v-2.5 h5.5 v-5.5 h2.5 z" />
+
+    <!-- ================= PRINT/ALBUM EMBLEM (Floating Gold Seal) ================= -->
+    <!-- Gold Drop Shadow -->
+    <path
+        android:fillColor="#40000000"
+        android:pathData="M98,96 m-14,0 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" />
+
+    <!-- Gold Outer Circle -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M96,94 m-14,0 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" />
+
+    <path
+        android:pathData="M96,94 m-12.5,0 a12.5,12.5 0 1,0 25,0 a12.5,12.5 0 1,0 -25,0"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FEF3C7" />
+
+    <!-- Crisp White Printer Icon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M91,86 h10 v4 h-10 z M89,91 h14 c1,0 2,1 2,2 v5 c0,1 -1,2 -2,2 h-14 c-1,0 -2,-1 -2,-2 v-5 c0,-1 1,-2 2,-2 z M92,97 h8 v4 h-8 z" />
+
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M93,98.5 h6 v1.2 h-6 z" />
+
+</vector>
