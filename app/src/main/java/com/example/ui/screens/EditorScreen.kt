@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -560,11 +561,13 @@ fun EditorScreen(
                         voterBack = voterBack,
                         coverFront = coverFront,
                         coverBack = coverBack,
+                        layoutStyle = layoutStyle,
                         filterType = filterType,
                         showCutGuides = showCutGuides,
                         showLabels = showLabels,
                         showVerticalMargin = showVerticalMargin,
                         showHorizontalMargin = showHorizontalMargin,
+                        onLayoutStyleChange = { viewModel.setLayoutStyle(it) },
                         onFilterTypeChange = { viewModel.setFilterType(it) },
                         onShowCutGuidesChange = { viewModel.setShowCutGuides(it) },
                         onShowLabelsChange = { viewModel.setShowLabels(it) },
@@ -582,7 +585,7 @@ fun EditorScreen(
                                 voterBackUri = voterBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
-                                layoutStyle = "MULTI_ID_GRID",
+                                layoutStyle = layoutStyle,
                                 filterType = filterType,
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
@@ -604,7 +607,7 @@ fun EditorScreen(
                                 voterBackUri = voterBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
-                                layoutStyle = "MULTI_ID_GRID",
+                                layoutStyle = layoutStyle,
                                 filterType = filterType,
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
@@ -627,7 +630,7 @@ fun EditorScreen(
                                 voterBackUri = voterBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
-                                layoutStyle = "MULTI_ID_GRID",
+                                layoutStyle = layoutStyle,
                                 filterType = filterType,
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
@@ -650,7 +653,7 @@ fun EditorScreen(
                                 voterBackUri = voterBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
-                                layoutStyle = "MULTI_ID_GRID",
+                                layoutStyle = layoutStyle,
                                 filterType = filterType,
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
@@ -673,7 +676,7 @@ fun EditorScreen(
                                 voterBackUri = voterBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
-                                layoutStyle = "MULTI_ID_GRID",
+                                layoutStyle = layoutStyle,
                                 filterType = filterType,
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
@@ -697,7 +700,7 @@ fun EditorScreen(
                                 voterBackUri = voterBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
-                                layoutStyle = "MULTI_ID_GRID",
+                                layoutStyle = layoutStyle,
                                 filterType = filterType,
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
@@ -964,11 +967,13 @@ fun A4AlbumStudioSection(
     voterBack: Uri?,
     coverFront: Uri?,
     coverBack: Uri?,
+    layoutStyle: String,
     filterType: String,
     showCutGuides: Boolean,
     showLabels: Boolean,
     showVerticalMargin: Boolean,
     showHorizontalMargin: Boolean,
+    onLayoutStyleChange: (String) -> Unit,
     onFilterTypeChange: (String) -> Unit,
     onShowCutGuidesChange: (Boolean) -> Unit,
     onShowLabelsChange: (Boolean) -> Unit,
@@ -1002,22 +1007,22 @@ fun A4AlbumStudioSection(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(420.dp),
-                shape = RoundedCornerShape(6.dp),
+                    .height(540.dp),
+                shape = RoundedCornerShape(8.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 14.dp, vertical = 18.dp),
+                        .padding(horizontal = 16.dp, vertical = 20.dp),
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    MiniRowPreview(panFront, panBack, showCutGuides)
-                    MiniRowPreview(voterFront, voterBack, showCutGuides)
-                    MiniRowPreview(aadhaarFront, aadhaarBack, showCutGuides)
-                    MiniRowPreview(coverFront, coverBack, showCutGuides)
+                    MiniRowPreview(panFront, voterBack, showCutGuides)
+                    MiniRowPreview(panBack, voterFront, showCutGuides)
+                    MiniRowPreview(aadhaarFront, coverBack, showCutGuides)
+                    MiniRowPreview(aadhaarBack, coverFront, showCutGuides)
                 }
             }
 
@@ -1035,6 +1040,28 @@ fun A4AlbumStudioSection(
                 Icon(Icons.Default.Visibility, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Open Full Print Preview", fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text("A4 Layout Style Options", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = layoutStyle == "MULTI_ID_GRID",
+                    onClick = { onLayoutStyleChange("MULTI_ID_GRID") },
+                    label = { Text("Option 1 (Top Aligned)", fontSize = 11.sp) },
+                    modifier = Modifier.weight(1f)
+                )
+                FilterChip(
+                    selected = layoutStyle == "MULTI_ID_GRID_CENTERED",
+                    onClick = { onLayoutStyleChange("MULTI_ID_GRID_CENTERED") },
+                    label = { Text("Option 2 (Centered)", fontSize = 11.sp) },
+                    modifier = Modifier.weight(1f)
+                )
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -1170,50 +1197,54 @@ fun A4AlbumStudioSection(
 
 @Composable
 fun MiniRowPreview(
-    frontUri: Uri?,
-    backUri: Uri?,
-    showCutGuides: Boolean
+    leftUri: Uri?,
+    rightUri: Uri?,
+    showCutGuides: Boolean,
+    rotateRight: Boolean = true
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp),
-        horizontalArrangement = Arrangement.spacedBy(0.dp)
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Box(
             modifier = Modifier
                 .weight(1f)
-                .height(68.dp)
-                .clip(RoundedCornerShape(3.dp))
-                .background(if (frontUri != null) Color.White else Color(0xFFF8FAFC))
+                .height(98.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(if (leftUri != null) Color.White else Color(0xFFF8FAFC))
                 .then(
-                    if (showCutGuides) Modifier.border(0.75.dp, Color(0xFFCBD5E1), RoundedCornerShape(3.dp))
+                    if (showCutGuides) Modifier.border(1.dp, Color(0xFFCBD5E1), RoundedCornerShape(4.dp))
                     else Modifier
                 ),
             contentAlignment = Alignment.Center
         ) {
-            if (frontUri != null) {
-                AsyncImage(model = frontUri, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
+            if (leftUri != null) {
+                AsyncImage(model = leftUri, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
             } else {
-                Icon(Icons.Default.AddPhotoAlternate, contentDescription = null, tint = Color(0xFFCBD5E1), modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.AddPhotoAlternate, contentDescription = null, tint = Color(0xFFCBD5E1), modifier = Modifier.size(24.dp))
             }
         }
         Box(
             modifier = Modifier
                 .weight(1f)
-                .height(68.dp)
-                .clip(RoundedCornerShape(3.dp))
-                .background(if (backUri != null) Color.White else Color(0xFFF8FAFC))
+                .height(98.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(if (rightUri != null) Color.White else Color(0xFFF8FAFC))
                 .then(
-                    if (showCutGuides) Modifier.border(0.75.dp, Color(0xFFCBD5E1), RoundedCornerShape(3.dp))
+                    if (showCutGuides) Modifier.border(1.dp, Color(0xFFCBD5E1), RoundedCornerShape(4.dp))
                     else Modifier
+                )
+                .then(
+                    if (rotateRight && rightUri != null) Modifier.graphicsLayer(rotationZ = 180f) else Modifier
                 ),
             contentAlignment = Alignment.Center
         ) {
-            if (backUri != null) {
-                AsyncImage(model = backUri, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
+            if (rightUri != null) {
+                AsyncImage(model = rightUri, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
             } else {
-                Icon(Icons.Default.AddPhotoAlternate, contentDescription = null, tint = Color(0xFFCBD5E1), modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.AddPhotoAlternate, contentDescription = null, tint = Color(0xFFCBD5E1), modifier = Modifier.size(24.dp))
             }
         }
     }
