@@ -199,10 +199,10 @@ object A4DocumentGenerator {
         val vGap = if (showVerticalMargin) 40f else 0f
 
         val rowPairs = listOf(
-            Pair(panFront, rotateBitmap180(voterBack)),
-            Pair(panBack, rotateBitmap180(voterFront)),
-            Pair(aadhaarFront, rotateBitmap180(coverFront)),
-            Pair(aadhaarBack, rotateBitmap180(coverBack))
+            Pair(panFront, rotateBitmap180(aadhaarBack)),
+            Pair(panBack, rotateBitmap180(aadhaarFront)),
+            Pair(voterFront, rotateBitmap180(coverFront)),
+            Pair(voterBack, rotateBitmap180(coverBack))
         )
 
         rowPairs.forEachIndexed { index, (leftBmp, rightBmp) ->
@@ -277,10 +277,10 @@ object A4DocumentGenerator {
         val startY = marginTopPx + ((availableH - totalGridH) / 2f).coerceAtLeast(0f)
 
         val rowPairs = listOf(
-            Pair(panFront, rotateBitmap180(voterBack)),
-            Pair(panBack, rotateBitmap180(voterFront)),
-            Pair(aadhaarFront, rotateBitmap180(coverFront)),
-            Pair(aadhaarBack, rotateBitmap180(coverBack))
+            Pair(panFront, rotateBitmap180(aadhaarBack)),
+            Pair(panBack, rotateBitmap180(aadhaarFront)),
+            Pair(voterFront, rotateBitmap180(coverFront)),
+            Pair(voterBack, rotateBitmap180(coverBack))
         )
 
         rowPairs.forEachIndexed { index, (leftBmp, rightBmp) ->
