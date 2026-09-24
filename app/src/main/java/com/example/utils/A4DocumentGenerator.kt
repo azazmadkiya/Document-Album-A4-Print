@@ -233,13 +233,15 @@ object A4DocumentGenerator {
         showHorizontalMargin: Boolean
     ) {
         val numRows = 4
-        val cardWidthMm = 85.6f
-        val cardHeightMm = 53.98f
+        // Official portrait ID card dimensions: Width = 54 mm (5.4 cm), Height = 85.6 mm (8.5 cm)
+        val cardWidthMm = 54.0f
+        val maxAllowedH = (A4_HEIGHT_PX.toFloat() - 100f) / numRows / MM_TO_PX
+        val cardHeightMm = min(85.6f, maxAllowedH)
         val cardW = cardWidthMm * MM_TO_PX
         val cardH = cardHeightMm * MM_TO_PX
-        val hGap = if (showHorizontalMargin) 40f else 0f
+        val hGap = if (showHorizontalMargin) 40f else 20f
         val totalGridW = (cardW * 2f) + hGap
-        val vGap = if (showVerticalMargin) 40f else 20f
+        val vGap = if (showVerticalMargin) 40f else 15f
         val totalGridH = (cardH * numRows) + (vGap * (numRows - 1))
         val startX = (A4_WIDTH_PX.toFloat() - totalGridW) / 2f
         val startY = (A4_HEIGHT_PX.toFloat() - totalGridH) / 2f
