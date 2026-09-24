@@ -66,7 +66,8 @@ object A4DocumentGenerator {
         showCutGuides: Boolean = true,
         showLabels: Boolean = true,
         showVerticalMargin: Boolean = false,
-        showHorizontalMargin: Boolean = false
+        showHorizontalMargin: Boolean = false,
+        cardScale: Float = 1.0f
     ): Bitmap {
         val bitmap = Bitmap.createBitmap(A4_WIDTH_PX, A4_HEIGHT_PX, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -107,7 +108,8 @@ object A4DocumentGenerator {
                 showCutGuides = showCutGuides,
                 showLabels = showLabels,
                 showVerticalMargin = showVerticalMargin,
-                showHorizontalMargin = showHorizontalMargin
+                showHorizontalMargin = showHorizontalMargin,
+                cardScale = cardScale
             )
         } else if (layoutStyle == "MULTI_ID_GRID_CENTERED") {
             drawCenteredMultiIdGrid(
@@ -124,7 +126,8 @@ object A4DocumentGenerator {
                 showCutGuides = showCutGuides,
                 showLabels = showLabels,
                 showVerticalMargin = showVerticalMargin,
-                showHorizontalMargin = showHorizontalMargin
+                showHorizontalMargin = showHorizontalMargin,
+                cardScale = cardScale
             )
         } else {
             val baseTargetW = (cardPrintSize.widthMm * MM_TO_PX).toInt()
@@ -159,13 +162,14 @@ object A4DocumentGenerator {
         showCutGuides: Boolean,
         showLabels: Boolean,
         showVerticalMargin: Boolean,
-        showHorizontalMargin: Boolean
+        showHorizontalMargin: Boolean,
+        cardScale: Float
     ) {
         val numRows = 4
 
         // CR80 ID Card physical dimensions: 85.6 mm x 53.98 mm
-        val cardWidthMm = 85.6f
-        val cardHeightMm = 53.98f
+        val cardWidthMm = 85.6f * cardScale
+        val cardHeightMm = 53.98f * cardScale
 
         val cardW = cardWidthMm * MM_TO_PX
         val cardH = cardHeightMm * MM_TO_PX
@@ -230,13 +234,14 @@ object A4DocumentGenerator {
         showCutGuides: Boolean,
         showLabels: Boolean,
         showVerticalMargin: Boolean,
-        showHorizontalMargin: Boolean
+        showHorizontalMargin: Boolean,
+        cardScale: Float
     ) {
         val numRows = 4
         // Official portrait ID card dimensions: Width = 54 mm (5.4 cm), Height = 85.6 mm (8.5 cm)
-        val cardWidthMm = 54.0f
+        val cardWidthMm = 54.0f * cardScale
         val maxAllowedH = (A4_HEIGHT_PX.toFloat() - 100f) / numRows / MM_TO_PX
-        val cardHeightMm = min(85.6f, maxAllowedH)
+        val cardHeightMm = min(85.6f * cardScale, maxAllowedH * cardScale)
         val cardW = cardWidthMm * MM_TO_PX
         val cardH = cardHeightMm * MM_TO_PX
         val hGap = if (showHorizontalMargin) 40f else 20f
