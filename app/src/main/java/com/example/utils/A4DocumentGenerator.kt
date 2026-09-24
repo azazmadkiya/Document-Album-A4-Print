@@ -66,7 +66,11 @@ object A4DocumentGenerator {
         showCutGuides: Boolean = true,
         showLabels: Boolean = true,
         showVerticalMargin: Boolean = false,
-        showHorizontalMargin: Boolean = false
+        showHorizontalMargin: Boolean = false,
+        marginTopMm: Float = 10f,
+        marginBottomMm: Float = 10f,
+        marginLeftMm: Float = 10f,
+        marginRightMm: Float = 10f
     ): Bitmap {
         val bitmap = Bitmap.createBitmap(A4_WIDTH_PX, A4_HEIGHT_PX, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -107,7 +111,11 @@ object A4DocumentGenerator {
                 showCutGuides = showCutGuides,
                 showLabels = showLabels,
                 showVerticalMargin = showVerticalMargin,
-                showHorizontalMargin = showHorizontalMargin
+                showHorizontalMargin = showHorizontalMargin,
+                marginTopMm = marginTopMm,
+                marginBottomMm = marginBottomMm,
+                marginLeftMm = marginLeftMm,
+                marginRightMm = marginRightMm
             )
         } else if (layoutStyle == "MULTI_ID_GRID_CENTERED") {
             drawCenteredMultiIdGrid(
@@ -124,7 +132,11 @@ object A4DocumentGenerator {
                 showCutGuides = showCutGuides,
                 showLabels = showLabels,
                 showVerticalMargin = showVerticalMargin,
-                showHorizontalMargin = showHorizontalMargin
+                showHorizontalMargin = showHorizontalMargin,
+                marginTopMm = marginTopMm,
+                marginBottomMm = marginBottomMm,
+                marginLeftMm = marginLeftMm,
+                marginRightMm = marginRightMm
             )
         } else {
             val baseTargetW = (cardPrintSize.widthMm * MM_TO_PX).toInt()
@@ -159,7 +171,11 @@ object A4DocumentGenerator {
         showCutGuides: Boolean,
         showLabels: Boolean,
         showVerticalMargin: Boolean,
-        showHorizontalMargin: Boolean
+        showHorizontalMargin: Boolean,
+        marginTopMm: Float = 10f,
+        marginBottomMm: Float = 10f,
+        marginLeftMm: Float = 10f,
+        marginRightMm: Float = 10f
     ) {
         val numRows = 4
 
@@ -170,22 +186,23 @@ object A4DocumentGenerator {
         val cardW = cardWidthMm * MM_TO_PX
         val cardH = cardHeightMm * MM_TO_PX
 
+        val marginLeftPx = marginLeftMm * MM_TO_PX
+        val marginRightPx = marginRightMm * MM_TO_PX
+        val marginTopPx = marginTopMm * MM_TO_PX
+
         val hGap = if (showHorizontalMargin) 40f else 0f
         val totalGridW = (cardW * 2f) + hGap
-        val startX = if (showHorizontalMargin) {
-            80f
-        } else {
-            ((A4_WIDTH_PX.toFloat() - totalGridW) / 2f).coerceAtLeast(0f)
-        }
+        val availableW = A4_WIDTH_PX.toFloat() - marginLeftPx - marginRightPx
+        val startX = marginLeftPx + ((availableW - totalGridW) / 2f).coerceAtLeast(0f)
 
-        val startY = if (showVerticalMargin) 80f else 60f
+        val startY = marginTopPx
         val vGap = if (showVerticalMargin) 40f else 0f
 
         val rowPairs = listOf(
             Pair(panFront, rotateBitmap180(voterBack)),
             Pair(panBack, rotateBitmap180(voterFront)),
-            Pair(aadhaarFront, rotateBitmap180(coverBack)),
-            Pair(aadhaarBack, rotateBitmap180(coverFront))
+            Pair(aadhaarFront, rotateBitmap180(coverFront)),
+            Pair(aadhaarBack, rotateBitmap180(coverBack))
         )
 
         rowPairs.forEachIndexed { index, (leftBmp, rightBmp) ->
@@ -230,12 +247,23 @@ object A4DocumentGenerator {
         showCutGuides: Boolean,
         showLabels: Boolean,
         showVerticalMargin: Boolean,
-        showHorizontalMargin: Boolean
+        showHorizontalMargin: Boolean,
+        marginTopMm: Float = 10f,
+        marginBottomMm: Float = 10f,
+        marginLeftMm: Float = 10f,
+        marginRightMm: Float = 10f
     ) {
         val numRows = 4
         // Official portrait ID card dimensions: Width = 54 mm (5.4 cm), Height = 85.6 mm (8.5 cm)
         val cardWidthMm = 54.0f
-        val maxAllowedH = (A4_HEIGHT_PX.toFloat() - 100f) / numRows / MM_TO_PX
+
+        val marginLeftPx = marginLeftMm * MM_TO_PX
+        val marginRightPx = marginRightMm * MM_TO_PX
+        val marginTopPx = marginTopMm * MM_TO_PX
+        val marginBottomPx = marginBottomMm * MM_TO_PX
+
+        val availableH = A4_HEIGHT_PX.toFloat() - marginTopPx - marginBottomPx
+        val maxAllowedH = (availableH - 100f) / numRows / MM_TO_PX
         val cardHeightMm = min(85.6f, maxAllowedH)
         val cardW = cardWidthMm * MM_TO_PX
         val cardH = cardHeightMm * MM_TO_PX
@@ -243,14 +271,16 @@ object A4DocumentGenerator {
         val totalGridW = (cardW * 2f) + hGap
         val vGap = if (showVerticalMargin) 40f else 15f
         val totalGridH = (cardH * numRows) + (vGap * (numRows - 1))
-        val startX = (A4_WIDTH_PX.toFloat() - totalGridW) / 2f
-        val startY = (A4_HEIGHT_PX.toFloat() - totalGridH) / 2f
+
+        val availableW = A4_WIDTH_PX.toFloat() - marginLeftPx - marginRightPx
+        val startX = marginLeftPx + ((availableW - totalGridW) / 2f).coerceAtLeast(0f)
+        val startY = marginTopPx + ((availableH - totalGridH) / 2f).coerceAtLeast(0f)
 
         val rowPairs = listOf(
             Pair(panFront, rotateBitmap180(voterBack)),
             Pair(panBack, rotateBitmap180(voterFront)),
-            Pair(aadhaarFront, rotateBitmap180(coverBack)),
-            Pair(aadhaarBack, rotateBitmap180(coverFront))
+            Pair(aadhaarFront, rotateBitmap180(coverFront)),
+            Pair(aadhaarBack, rotateBitmap180(coverBack))
         )
 
         rowPairs.forEachIndexed { index, (leftBmp, rightBmp) ->

@@ -40,6 +40,8 @@ import com.example.ui.components.PrintPreviewDialog
 import com.example.ui.viewmodel.DocViewModel
 import com.example.utils.A4DocumentGenerator
 import com.example.utils.CardPrintSize
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
@@ -68,6 +70,10 @@ fun EditorScreen(
     val showLabels by viewModel.showLabels.collectAsState()
     val showVerticalMargin by viewModel.showVerticalMargin.collectAsState()
     val showHorizontalMargin by viewModel.showHorizontalMargin.collectAsState()
+    val marginTopMm by viewModel.marginTopMm.collectAsState()
+    val marginBottomMm by viewModel.marginBottomMm.collectAsState()
+    val marginLeftMm by viewModel.marginLeftMm.collectAsState()
+    val marginRightMm by viewModel.marginRightMm.collectAsState()
 
     var selectedTab by remember { mutableIntStateOf(0) } // 0: Aadhaar, 1: PAN, 2: Voter, 3: DL, 4: A4 Studio
 
@@ -320,7 +326,7 @@ fun EditorScreen(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
                     icon = { Icon(Icons.Default.CreditCard, contentDescription = null, modifier = Modifier.size(18.dp)) },
-                    text = { Text("Aadhaar") }
+                    text = { Text("Voter ID") }
                 )
                 Tab(
                     selected = selectedTab == 1,
@@ -332,7 +338,7 @@ fun EditorScreen(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
                     icon = { Icon(Icons.Default.CreditCard, contentDescription = null, modifier = Modifier.size(18.dp)) },
-                    text = { Text("Voter ID") }
+                    text = { Text("Aadhaar") }
                 )
                 Tab(
                     selected = selectedTab == 3,
@@ -373,46 +379,46 @@ fun EditorScreen(
             when (selectedTab) {
                 0 -> {
                     CardDocumentSection(
-                        cardName = "Aadhaar Card",
-                        frontUri = aadhaarFront,
-                        backUri = aadhaarBack,
-                        onPickFront = { launchGallery("AADHAAR_FRONT") },
-                        onCaptureFront = { launchCamera("AADHAAR_FRONT") },
+                        cardName = "Voter ID Card",
+                        frontUri = voterFront,
+                        backUri = voterBack,
+                        onPickFront = { launchGallery("VOTER_FRONT") },
+                        onCaptureFront = { launchCamera("VOTER_FRONT") },
                         onEditFront = {
-                            if (aadhaarFront != null) {
-                                pendingImageUri = aadhaarFront
-                                editingSlot = "AADHAAR_FRONT"
+                            if (voterFront != null) {
+                                pendingImageUri = voterFront
+                                editingSlot = "VOTER_FRONT"
                                 startInCropMode = true
                             }
                         },
                         onRotateFront = {
-                            aadhaarFront?.let { uri ->
+                            voterFront?.let { uri ->
                                 rotateImageUri(uri)?.let {
-                                    viewModel.setAadhaarFront(it)
+                                    viewModel.setVoterFront(it)
                                     Toast.makeText(context, "Rotated 90°", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
-                        onClearFront = { viewModel.setAadhaarFront(null) },
-                        onPickBack = { launchGallery("AADHAAR_BACK") },
-                        onCaptureBack = { launchCamera("AADHAAR_BACK") },
+                        onClearFront = { viewModel.setVoterFront(null) },
+                        onPickBack = { launchGallery("VOTER_BACK") },
+                        onCaptureBack = { launchCamera("VOTER_BACK") },
                         onEditBack = {
-                            if (aadhaarBack != null) {
-                                pendingImageUri = aadhaarBack
-                                editingSlot = "AADHAAR_BACK"
+                            if (voterBack != null) {
+                                pendingImageUri = voterBack
+                                editingSlot = "VOTER_BACK"
                                 startInCropMode = true
                             }
                         },
                         onRotateBack = {
-                            aadhaarBack?.let { uri ->
+                            voterBack?.let { uri ->
                                 rotateImageUri(uri)?.let {
-                                    viewModel.setAadhaarBack(it)
+                                    viewModel.setVoterBack(it)
                                     Toast.makeText(context, "Rotated 90°", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
-                        onClearBack = { viewModel.setAadhaarBack(null) },
-                        onUploadPdf = { launchPdfPicker("AADHAAR") },
+                        onClearBack = { viewModel.setVoterBack(null) },
+                        onUploadPdf = { launchPdfPicker("VOTER") },
                         onNext = { selectedTab = 1 }
                     )
                 }
@@ -463,46 +469,46 @@ fun EditorScreen(
                 }
                 2 -> {
                     CardDocumentSection(
-                        cardName = "Voter ID Card",
-                        frontUri = voterFront,
-                        backUri = voterBack,
-                        onPickFront = { launchGallery("VOTER_FRONT") },
-                        onCaptureFront = { launchCamera("VOTER_FRONT") },
+                        cardName = "Aadhaar Card",
+                        frontUri = aadhaarFront,
+                        backUri = aadhaarBack,
+                        onPickFront = { launchGallery("AADHAAR_FRONT") },
+                        onCaptureFront = { launchCamera("AADHAAR_FRONT") },
                         onEditFront = {
-                            if (voterFront != null) {
-                                pendingImageUri = voterFront
-                                editingSlot = "VOTER_FRONT"
+                            if (aadhaarFront != null) {
+                                pendingImageUri = aadhaarFront
+                                editingSlot = "AADHAAR_FRONT"
                                 startInCropMode = true
                             }
                         },
                         onRotateFront = {
-                            voterFront?.let { uri ->
+                            aadhaarFront?.let { uri ->
                                 rotateImageUri(uri)?.let {
-                                    viewModel.setVoterFront(it)
+                                    viewModel.setAadhaarFront(it)
                                     Toast.makeText(context, "Rotated 90°", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
-                        onClearFront = { viewModel.setVoterFront(null) },
-                        onPickBack = { launchGallery("VOTER_BACK") },
-                        onCaptureBack = { launchCamera("VOTER_BACK") },
+                        onClearFront = { viewModel.setAadhaarFront(null) },
+                        onPickBack = { launchGallery("AADHAAR_BACK") },
+                        onCaptureBack = { launchCamera("AADHAAR_BACK") },
                         onEditBack = {
-                            if (voterBack != null) {
-                                pendingImageUri = voterBack
-                                editingSlot = "VOTER_BACK"
+                            if (aadhaarBack != null) {
+                                pendingImageUri = aadhaarBack
+                                editingSlot = "AADHAAR_BACK"
                                 startInCropMode = true
                             }
                         },
                         onRotateBack = {
-                            voterBack?.let { uri ->
+                            aadhaarBack?.let { uri ->
                                 rotateImageUri(uri)?.let {
-                                    viewModel.setVoterBack(it)
+                                    viewModel.setAadhaarBack(it)
                                     Toast.makeText(context, "Rotated 90°", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
-                        onClearBack = { viewModel.setVoterBack(null) },
-                        onUploadPdf = { launchPdfPicker("VOTER") },
+                        onClearBack = { viewModel.setAadhaarBack(null) },
+                        onUploadPdf = { launchPdfPicker("AADHAAR") },
                         onNext = { selectedTab = 3 }
                     )
                 }
@@ -567,12 +573,20 @@ fun EditorScreen(
                         showLabels = showLabels,
                         showVerticalMargin = showVerticalMargin,
                         showHorizontalMargin = showHorizontalMargin,
+                        marginTopMm = marginTopMm,
+                        marginBottomMm = marginBottomMm,
+                        marginLeftMm = marginLeftMm,
+                        marginRightMm = marginRightMm,
                         onLayoutStyleChange = { viewModel.setLayoutStyle(it) },
                         onFilterTypeChange = { viewModel.setFilterType(it) },
                         onShowCutGuidesChange = { viewModel.setShowCutGuides(it) },
                         onShowLabelsChange = { viewModel.setShowLabels(it) },
                         onShowVerticalMarginChange = { viewModel.setShowVerticalMargin(it) },
                         onShowHorizontalMarginChange = { viewModel.setShowHorizontalMargin(it) },
+                        onMarginTopChange = { viewModel.setMarginTop(it) },
+                        onMarginBottomChange = { viewModel.setMarginBottom(it) },
+                        onMarginLeftChange = { viewModel.setMarginLeft(it) },
+                        onMarginRightChange = { viewModel.setMarginRight(it) },
                         onPreview = {
                             val bitmap = A4DocumentGenerator.generateA4Bitmap(
                                 context = context,
@@ -590,7 +604,11 @@ fun EditorScreen(
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
                                 showVerticalMargin = showVerticalMargin,
-                                showHorizontalMargin = showHorizontalMargin
+                                showHorizontalMargin = showHorizontalMargin,
+                                marginTopMm = marginTopMm,
+                                marginBottomMm = marginBottomMm,
+                                marginLeftMm = marginLeftMm,
+                                marginRightMm = marginRightMm
                             )
                             previewBitmap = bitmap
                             showPreviewDialog = true
@@ -612,7 +630,11 @@ fun EditorScreen(
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
                                 showVerticalMargin = showVerticalMargin,
-                                showHorizontalMargin = showHorizontalMargin
+                                showHorizontalMargin = showHorizontalMargin,
+                                marginTopMm = marginTopMm,
+                                marginBottomMm = marginBottomMm,
+                                marginLeftMm = marginLeftMm,
+                                marginRightMm = marginRightMm
                             )
                             viewModel.saveDocument {
                                 A4DocumentGenerator.printA4Bitmap(context, bitmap, title)
@@ -635,7 +657,11 @@ fun EditorScreen(
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
                                 showVerticalMargin = showVerticalMargin,
-                                showHorizontalMargin = showHorizontalMargin
+                                showHorizontalMargin = showHorizontalMargin,
+                                marginTopMm = marginTopMm,
+                                marginBottomMm = marginBottomMm,
+                                marginLeftMm = marginLeftMm,
+                                marginRightMm = marginRightMm
                             )
                             viewModel.saveDocument {
                                 A4DocumentGenerator.saveA4BitmapToStorage(context, bitmap, title)
@@ -658,7 +684,11 @@ fun EditorScreen(
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
                                 showVerticalMargin = showVerticalMargin,
-                                showHorizontalMargin = showHorizontalMargin
+                                showHorizontalMargin = showHorizontalMargin,
+                                marginTopMm = marginTopMm,
+                                marginBottomMm = marginBottomMm,
+                                marginLeftMm = marginLeftMm,
+                                marginRightMm = marginRightMm
                             )
                             viewModel.saveDocument {
                                 A4DocumentGenerator.saveA4PdfToStorage(context, bitmap, title)
@@ -681,7 +711,11 @@ fun EditorScreen(
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
                                 showVerticalMargin = showVerticalMargin,
-                                showHorizontalMargin = showHorizontalMargin
+                                showHorizontalMargin = showHorizontalMargin,
+                                marginTopMm = marginTopMm,
+                                marginBottomMm = marginBottomMm,
+                                marginLeftMm = marginLeftMm,
+                                marginRightMm = marginRightMm
                             )
                             val uri = A4DocumentGenerator.saveA4BitmapToStorage(context, bitmap, title)
                             if (uri != null) {
@@ -705,7 +739,11 @@ fun EditorScreen(
                                 showCutGuides = showCutGuides,
                                 showLabels = showLabels,
                                 showVerticalMargin = showVerticalMargin,
-                                showHorizontalMargin = showHorizontalMargin
+                                showHorizontalMargin = showHorizontalMargin,
+                                marginTopMm = marginTopMm,
+                                marginBottomMm = marginBottomMm,
+                                marginLeftMm = marginLeftMm,
+                                marginRightMm = marginRightMm
                             )
                             val uri = A4DocumentGenerator.saveA4PdfToStorage(context, bitmap, title)
                             if (uri != null) {
@@ -973,12 +1011,20 @@ fun A4AlbumStudioSection(
     showLabels: Boolean,
     showVerticalMargin: Boolean,
     showHorizontalMargin: Boolean,
+    marginTopMm: Float,
+    marginBottomMm: Float,
+    marginLeftMm: Float,
+    marginRightMm: Float,
     onLayoutStyleChange: (String) -> Unit,
     onFilterTypeChange: (String) -> Unit,
     onShowCutGuidesChange: (Boolean) -> Unit,
     onShowLabelsChange: (Boolean) -> Unit,
     onShowVerticalMarginChange: (Boolean) -> Unit,
     onShowHorizontalMarginChange: (Boolean) -> Unit,
+    onMarginTopChange: (Float) -> Unit,
+    onMarginBottomChange: (Float) -> Unit,
+    onMarginLeftChange: (Float) -> Unit,
+    onMarginRightChange: (Float) -> Unit,
     onPreview: () -> Unit,
     onPrint: () -> Unit,
     onSaveImage: () -> Unit,
@@ -986,6 +1032,39 @@ fun A4AlbumStudioSection(
     onShareImage: () -> Unit,
     onSharePdf: () -> Unit
 ) {
+    val context = LocalContext.current
+    val previewBitmap by produceState<Bitmap?>(
+        initialValue = null,
+        title, aadhaarFront, aadhaarBack, panFront, panBack, voterFront, voterBack, coverFront, coverBack,
+        layoutStyle, filterType, showCutGuides, showLabels, showVerticalMargin, showHorizontalMargin,
+        marginTopMm, marginBottomMm, marginLeftMm, marginRightMm
+    ) {
+        value = withContext(Dispatchers.Default) {
+            A4DocumentGenerator.generateA4Bitmap(
+                context = context,
+                title = title,
+                aadhaarFrontUri = aadhaarFront,
+                aadhaarBackUri = aadhaarBack,
+                panFrontUri = panFront,
+                panBackUri = panBack,
+                voterFrontUri = voterFront,
+                voterBackUri = voterBack,
+                coverFrontUri = coverFront,
+                coverBackUri = coverBack,
+                layoutStyle = layoutStyle,
+                filterType = filterType,
+                showCutGuides = showCutGuides,
+                showLabels = showLabels,
+                showVerticalMargin = showVerticalMargin,
+                showHorizontalMargin = showHorizontalMargin,
+                marginTopMm = marginTopMm,
+                marginBottomMm = marginBottomMm,
+                marginLeftMm = marginLeftMm,
+                marginRightMm = marginRightMm
+            )
+        }
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -1012,17 +1091,20 @@ fun A4AlbumStudioSection(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 20.dp),
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    MiniRowPreview(panFront, voterBack, showCutGuides)
-                    MiniRowPreview(panBack, voterFront, showCutGuides)
-                    MiniRowPreview(aadhaarFront, coverBack, showCutGuides)
-                    MiniRowPreview(aadhaarBack, coverFront, showCutGuides)
+                    if (previewBitmap != null) {
+                        AsyncImage(
+                            model = previewBitmap,
+                            contentDescription = "A4 Page Preview",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Fit
+                        )
+                    } else {
+                        CircularProgressIndicator(modifier = Modifier.size(36.dp), color = MaterialTheme.colorScheme.primary)
+                    }
                 }
             }
 
@@ -1062,6 +1144,23 @@ fun A4AlbumStudioSection(
                     label = { Text("Option 2 (Centered)", fontSize = 11.sp) },
                     modifier = Modifier.weight(1f)
                 )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text("Custom Margins (Printer Compatibility)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(4.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    MarginSliderRow("Top Margin", marginTopMm, onMarginTopChange)
+                    MarginSliderRow("Bottom Margin", marginBottomMm, onMarginBottomChange)
+                    MarginSliderRow("Left Margin", marginLeftMm, onMarginLeftChange)
+                    MarginSliderRow("Right Margin", marginRightMm, onMarginRightChange)
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -1247,5 +1346,24 @@ fun MiniRowPreview(
                 Icon(Icons.Default.AddPhotoAlternate, contentDescription = null, tint = Color(0xFFCBD5E1), modifier = Modifier.size(24.dp))
             }
         }
+    }
+}
+
+@Composable
+fun MarginSliderRow(label: String, value: Float, onValueChange: (Float) -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(label, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text("${value.toInt()} mm", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+        }
+        Slider(
+            value = value,
+            onValueChange = onValueChange,
+            valueRange = 0f..40f,
+            steps = 40
+        )
     }
 }

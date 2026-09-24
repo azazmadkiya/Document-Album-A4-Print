@@ -62,6 +62,18 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
     private val _showHorizontalMargin = MutableStateFlow(false)
     val showHorizontalMargin: StateFlow<Boolean> = _showHorizontalMargin.asStateFlow()
 
+    private val _marginTopMm = MutableStateFlow(10f)
+    val marginTopMm: StateFlow<Float> = _marginTopMm.asStateFlow()
+
+    private val _marginBottomMm = MutableStateFlow(10f)
+    val marginBottomMm: StateFlow<Float> = _marginBottomMm.asStateFlow()
+
+    private val _marginLeftMm = MutableStateFlow(10f)
+    val marginLeftMm: StateFlow<Float> = _marginLeftMm.asStateFlow()
+
+    private val _marginRightMm = MutableStateFlow(10f)
+    val marginRightMm: StateFlow<Float> = _marginRightMm.asStateFlow()
+
     fun setDocTitle(title: String) {
         _docTitle.value = title
     }
@@ -102,6 +114,11 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
     fun setShowHorizontalMargin(show: Boolean) {
         _showHorizontalMargin.value = show
     }
+
+    fun setMarginTop(value: Float) { _marginTopMm.value = value }
+    fun setMarginBottom(value: Float) { _marginBottomMm.value = value }
+    fun setMarginLeft(value: Float) { _marginLeftMm.value = value }
+    fun setMarginRight(value: Float) { _marginRightMm.value = value }
 
     fun saveDocument(onSaved: (Long) -> Unit) {
         val title = _docTitle.value.ifBlank { "ID Document Album" }
