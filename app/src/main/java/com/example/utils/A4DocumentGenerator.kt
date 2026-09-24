@@ -146,9 +146,9 @@ object A4DocumentGenerator {
     ) {
         val numRows = 4
 
-        // CR80 ID Card physical dimensions: 85.6 mm x 53.98 mm (Landscape)
-        val cardWidthMm = 85.6f
-        val cardHeightMm = 53.98f
+        // Portrait ID Card dimensions: 54mm width x 85.6mm height
+        val cardWidthMm = 54.0f
+        val cardHeightMm = 85.6f
 
         val cardW = cardWidthMm * MM_TO_PX
         val cardH = cardHeightMm * MM_TO_PX
