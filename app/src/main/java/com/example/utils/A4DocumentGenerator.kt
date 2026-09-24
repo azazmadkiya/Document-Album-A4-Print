@@ -146,15 +146,12 @@ object A4DocumentGenerator {
     ) {
         val numRows = 4
 
-        // Width: 5.4 cm (53.98 mm) portrait width
-        val cardWidthMm = 53.98f
-        val cardW = cardWidthMm * MM_TO_PX
+        // CR80 ID Card physical dimensions: 85.6 mm x 53.98 mm (Landscape)
+        val cardWidthMm = 85.6f
+        val cardHeightMm = 53.98f
 
-        val vMargin = if (showVerticalMargin) 80f else 60f
-        val vGap = if (showVerticalMargin) 40f else 0f
-        val totalVSpace = (vMargin * 2f) + (vGap * (numRows - 1))
-        val availableH = A4_HEIGHT_PX.toFloat() - totalVSpace
-        val cardH = availableH / numRows
+        val cardW = cardWidthMm * MM_TO_PX
+        val cardH = cardHeightMm * MM_TO_PX
 
         val hGap = if (showHorizontalMargin) 40f else 0f
         val totalGridW = (cardW * 2f) + hGap
@@ -164,13 +161,14 @@ object A4DocumentGenerator {
             ((A4_WIDTH_PX.toFloat() - totalGridW) / 2f).coerceAtLeast(0f)
         }
 
-        val startY = vMargin
+        val startY = if (showVerticalMargin) 80f else 60f
+        val vGap = if (showVerticalMargin) 40f else 0f
 
         val rowPairs = listOf(
-            Pair(panFront, rotateBitmap180(aadhaarBack)),
-            Pair(panBack, rotateBitmap180(aadhaarFront)),
-            Pair(voterFront, rotateBitmap180(coverFront)),
-            Pair(voterBack, rotateBitmap180(coverBack))
+            Pair(panFront, rotateBitmap180(voterBack)),
+            Pair(panBack, rotateBitmap180(voterFront)),
+            Pair(aadhaarFront, rotateBitmap180(coverBack)),
+            Pair(aadhaarBack, rotateBitmap180(coverFront))
         )
 
         rowPairs.forEachIndexed { index, (leftBmp, rightBmp) ->

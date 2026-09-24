@@ -1015,8 +1015,8 @@ fun A4AlbumStudioSection(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     MiniRowPreview(panFront, panBack, showCutGuides)
-                    MiniRowPreview(aadhaarFront, aadhaarBack, showCutGuides)
                     MiniRowPreview(voterFront, voterBack, showCutGuides)
+                    MiniRowPreview(aadhaarFront, aadhaarBack, showCutGuides)
                     MiniRowPreview(coverFront, coverBack, showCutGuides)
                 }
             }
