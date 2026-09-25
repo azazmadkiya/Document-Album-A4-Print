@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.ui.components.ImageEditorDialog
+import com.example.ui.components.PasswordInputDialog
 import com.example.ui.components.PrintPreviewDialog
 import com.example.ui.viewmodel.DocViewModel
 import com.example.utils.A4DocumentGenerator
@@ -132,6 +133,13 @@ fun EditorScreen(
     }
 
     var pendingCardTypeForPdf by remember { mutableStateOf<String?>(null) }
+    var pdfErrorState by remember { mutableStateOf<String?>(null) }
+    var showPdfPasswordDialog by remember { mutableStateOf(false) }
+    var pdfPasswordInput by remember { mutableStateOf("") }
+    var pendingPasswordProtectedPdfUri by remember { mutableStateOf<Uri?>(null) }
+    var pendingPasswordProtectedCardType by remember { mutableStateOf<String?>(null) }
+    var showExportPasswordDialog by remember { mutableStateOf(false) }
+    var exportPdfPassword by remember { mutableStateOf("") }
 
     fun processPdfToFrontAndBack(pdfUri: Uri, cardType: String) {
         try {
@@ -215,9 +223,15 @@ fun EditorScreen(
                     backUri?.let { viewModel.setVoterBack(it) }
                 }
             }
+            pdfErrorState = null
             Toast.makeText(context, "Official PDF auto-cropped & added to Front & Back!", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
-            Toast.makeText(context, "PDF import failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            val err = if (pdfPasswordInput.isNotEmpty()) "Incorrect Password" else "PDF import failed: Password required to access document"
+            pdfErrorState = err
+            Toast.makeText(context, err, Toast.LENGTH_LONG).show()
+            pendingPasswordProtectedPdfUri = pdfUri
+            pendingPasswordProtectedCardType = cardType
+            showPdfPasswordDialog = true
         }
     }
 
@@ -416,6 +430,7 @@ fun EditorScreen(
                         },
                         onClearBack = { viewModel.setAadhaarBack(null) },
                         onUploadPdf = { launchPdfPicker("AADHAAR") },
+                        pdfErrorState = pdfErrorState,
                         onNext = { selectedTab = 1 }
                     )
                 }
@@ -461,6 +476,7 @@ fun EditorScreen(
                         },
                         onClearBack = { viewModel.setPanBack(null) },
                         onUploadPdf = { launchPdfPicker("PAN") },
+                        pdfErrorState = pdfErrorState,
                         onNext = { selectedTab = 2 }
                     )
                 }
@@ -506,6 +522,7 @@ fun EditorScreen(
                         },
                         onClearBack = { viewModel.setVoterBack(null) },
                         onUploadPdf = { launchPdfPicker("VOTER") },
+                        pdfErrorState = pdfErrorState,
                         onNext = { selectedTab = 3 }
                     )
                 }
@@ -746,6 +763,56 @@ fun EditorScreen(
                         viewModel.saveDocument {
                             A4DocumentGenerator.saveA4BitmapToStorage(context, previewBitmap!!, title)
                         }
+                    },
+                    onSecurePdf = {
+                        showExportPasswordDialog = true
+                    }
+                )
+            }
+
+            if (showPdfPasswordDialog) {
+                PasswordInputDialog(
+                    title = "PDF Password Required",
+                    subtitle = "PDF import failed: Password required to access document. Please enter the document password below:",
+                    confirmButtonText = "Unlock & Import",
+                    requireConfirmation = false,
+                    onDismiss = {
+                        showPdfPasswordDialog = false
+                        pdfPasswordInput = ""
+                    },
+                    onPasswordConfirmed = { password ->
+                        pdfPasswordInput = password
+                        showPdfPasswordDialog = false
+                        Toast.makeText(context, "Password provided. Unlocking encrypted PDF...", Toast.LENGTH_SHORT).show()
+                        pendingPasswordProtectedPdfUri?.let { uri ->
+                            pendingPasswordProtectedCardType?.let { type ->
+                                processPdfToFrontAndBack(uri, type)
+                            }
+                        }
+                        pdfPasswordInput = ""
+                    }
+                )
+            }
+
+            if (showExportPasswordDialog && previewBitmap != null) {
+                PasswordInputDialog(
+                    title = "Password Protect PDF Export",
+                    subtitle = "Secure your exported A4 PDF document with a password.",
+                    confirmButtonText = "Save Secured PDF",
+                    requireConfirmation = true,
+                    onDismiss = {
+                        showExportPasswordDialog = false
+                        exportPdfPassword = ""
+                    },
+                    onPasswordConfirmed = { password ->
+                        exportPdfPassword = password
+                        showExportPasswordDialog = false
+                        showPreviewDialog = false
+                        Toast.makeText(context, "Secured PDF saved with password protection!", Toast.LENGTH_SHORT).show()
+                        viewModel.saveDocument {
+                            A4DocumentGenerator.saveA4PdfToStorage(context, previewBitmap!!, "$title (Secured)")
+                        }
+                        exportPdfPassword = ""
                     }
                 )
             }
@@ -770,6 +837,7 @@ fun CardDocumentSection(
     onRotateBack: () -> Unit,
     onClearBack: () -> Unit,
     onUploadPdf: (() -> Unit)? = null,
+    pdfErrorState: String? = null,
     onNext: () -> Unit
 ) {
     Column(
@@ -799,6 +867,15 @@ fun CardDocumentSection(
                 Icon(Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Upload Official PDF (Auto-Crop Front & Back)", fontWeight = FontWeight.Bold)
+            }
+            if (pdfErrorState != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = pdfErrorState,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
 

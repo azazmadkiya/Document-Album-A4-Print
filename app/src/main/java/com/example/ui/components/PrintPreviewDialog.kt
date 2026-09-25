@@ -33,7 +33,8 @@ fun PrintPreviewDialog(
     onDismiss: () -> Unit,
     onPrint: () -> Unit,
     onSavePdf: () -> Unit,
-    onSaveImage: () -> Unit
+    onSaveImage: () -> Unit,
+    onSecurePdf: (() -> Unit)? = null
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offsetX by remember { mutableFloatStateOf(0f) }
@@ -127,25 +128,37 @@ fun PrintPreviewDialog(
                 // Bottom Action Bar
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     OutlinedButton(
                         onClick = onSaveImage,
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.SaveAlt, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Save Img", fontSize = 12.sp)
+                        Icon(Icons.Default.SaveAlt, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text("Img", fontSize = 11.sp)
                     }
                     OutlinedButton(
                         onClick = onSavePdf,
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.SaveAlt, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Save PDF", fontSize = 12.sp)
+                        Icon(Icons.Default.SaveAlt, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text("PDF", fontSize = 11.sp)
+                    }
+                    if (onSecurePdf != null) {
+                        OutlinedButton(
+                            onClick = onSecurePdf,
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.tertiary)
+                        ) {
+                            Icon(Icons.Default.SaveAlt, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Text("Secure", fontSize = 11.sp)
+                        }
                     }
                     Button(
                         onClick = {
@@ -155,9 +168,9 @@ fun PrintPreviewDialog(
                         modifier = Modifier.weight(1.2f),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.Print, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Print Now", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Icon(Icons.Default.Print, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Print", fontWeight = FontWeight.Bold, fontSize = 12.sp)
                     }
                 }
             }
