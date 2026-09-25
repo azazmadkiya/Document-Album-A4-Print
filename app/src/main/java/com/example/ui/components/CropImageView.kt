@@ -103,9 +103,14 @@ fun CropImageView(
         normBottom = normTop + safeH
     }
 
-    // Apply default preset on first launch
+    // Auto-detect document edges on launch
     LaunchedEffect(Unit) {
-        applyPresetRatio(presets[selectedPresetIndex].ratio)
+        val edges = com.example.utils.DocumentEdgeDetector.detectDocumentEdges(bitmap)
+        normLeft = edges[0]
+        normTop = edges[1]
+        normRight = edges[2]
+        normBottom = edges[3]
+        selectedPresetIndex = 0
     }
 
     Column(
@@ -391,6 +396,23 @@ fun CropImageView(
         ) {
             OutlinedButton(
                 onClick = {
+                    val edges = com.example.utils.DocumentEdgeDetector.detectDocumentEdges(bitmap)
+                    normLeft = edges[0]
+                    normTop = edges[1]
+                    normRight = edges[2]
+                    normBottom = edges[3]
+                    selectedPresetIndex = 0
+                },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Auto Detect", fontSize = 11.sp)
+            }
+
+            OutlinedButton(
+                onClick = {
                     normLeft = 0f
                     normTop = 0f
                     normRight = 1f
@@ -400,9 +422,9 @@ fun CropImageView(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Icon(Icons.Default.Fullscreen, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Fullscreen, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Fit Full")
+                Text("Full", fontSize = 11.sp)
             }
 
             Button(
