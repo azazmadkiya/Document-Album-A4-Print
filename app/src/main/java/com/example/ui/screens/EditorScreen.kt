@@ -1256,6 +1256,36 @@ fun A4AlbumStudioSection(
                     Text("Share PDF")
                 }
             }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                    .clickable {
+                        uriHandler.openUri("https://azazmadkiya.morbi.store")
+                    }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Developed By Azazmadkiya",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "azazmadkiya.morbi.store",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
         }
     }
 }
