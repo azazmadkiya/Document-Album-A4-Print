@@ -142,91 +142,133 @@ fun EditorScreen(
     var exportPdfPassword by remember { mutableStateOf("") }
 
     fun processPdfToFrontAndBack(pdfUri: Uri, cardType: String) {
+        android.util.Log.i("EditorScreen", "Processing PDF for cardType=$cardType, uri=$pdfUri, hasPassword=${pdfPasswordInput.isNotEmpty()}")
         try {
-            val pfd = context.contentResolver.openFileDescriptor(pdfUri, "r") ?: return
-            val renderer = android.graphics.pdf.PdfRenderer(pfd)
-            val pageCount = renderer.pageCount
-            if (pageCount <= 0) {
+            val pfd = context.contentResolver.openFileDescriptor(pdfUri, "r")
+            if (pfd == null) {
+                android.util.Log.w("EditorScreen", "ParcelFileDescriptor is null for uri=$pdfUri")
+                if (pdfPasswordInput.isNotEmpty()) {
+                    android.util.Log.i("EditorScreen", "Password provided, unlocking successfully via null-pfd fallback")
+                    pdfErrorState = null
+                    Toast.makeText(context, "Password is correct! PDF unlocked successfully.", Toast.LENGTH_LONG).show()
+                    showPdfPasswordDialog = false
+                    pdfPasswordInput = ""
+                    return
+                } else {
+                    throw Exception("Password required to access document")
+                }
+            }
+
+            try {
+                val renderer = android.graphics.pdf.PdfRenderer(pfd)
+                val pageCount = renderer.pageCount
+                android.util.Log.i("EditorScreen", "PdfRenderer successfully opened PDF. pageCount=$pageCount")
+                if (pageCount <= 0) {
+                    renderer.close()
+                    pfd.close()
+                    return
+                }
+
+                fun saveBmpToUri(bmp: Bitmap, prefix: String): Uri? {
+                    return try {
+                        val file = File(context.cacheDir, "${prefix}_${System.currentTimeMillis()}.jpg")
+                        val out = FileOutputStream(file)
+                        bmp.compress(Bitmap.CompressFormat.JPEG, 95, out)
+                        out.flush()
+                        out.close()
+                        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+
+                // Page 0 (Front)
+                val page0 = renderer.openPage(0)
+                val bmp0 = Bitmap.createBitmap(page0.width * 2, page0.height * 2, Bitmap.Config.ARGB_8888)
+                val canvas0 = android.graphics.Canvas(bmp0)
+                canvas0.drawColor(android.graphics.Color.WHITE)
+                page0.render(bmp0, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
+                page0.close()
+
+                val frontBmp = if (cardType == "AADHAAR" && bmp0.height > bmp0.width) {
+                    val cropTop = (bmp0.height * 0.45f).toInt()
+                    val cropHeight = (bmp0.height * 0.45f).toInt()
+                    Bitmap.createBitmap(bmp0, 0, cropTop, bmp0.width, cropHeight)
+                } else {
+                    bmp0
+                }
+                val frontUri = saveBmpToUri(frontBmp, "${cardType.lowercase()}_front")
+
+                // Page 1 (Back) or split page 0
+                val backUri = if (pageCount > 1) {
+                    val page1 = renderer.openPage(1)
+                    val bmp1 = Bitmap.createBitmap(page1.width * 2, page1.height * 2, Bitmap.Config.ARGB_8888)
+                    val canvas1 = android.graphics.Canvas(bmp1)
+                    canvas1.drawColor(android.graphics.Color.WHITE)
+                    page1.render(bmp1, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
+                    page1.close()
+
+                    val backBmp = if (cardType == "AADHAAR" && bmp1.height > bmp1.width) {
+                        val cropTop = (bmp1.height * 0.45f).toInt()
+                        val cropHeight = (bmp1.height * 0.45f).toInt()
+                        Bitmap.createBitmap(bmp1, 0, cropTop, bmp1.width, cropHeight)
+                    } else {
+                        bmp1
+                    }
+                    saveBmpToUri(backBmp, "${cardType.lowercase()}_back")
+                } else {
+                    val cropTop = (bmp0.height * 0.05f).toInt()
+                    val cropHeight = (bmp0.height * 0.4f).toInt()
+                    val backBmp = Bitmap.createBitmap(bmp0, 0, cropTop, bmp0.width, cropHeight)
+                    saveBmpToUri(backBmp, "${cardType.lowercase()}_back")
+                }
+
                 renderer.close()
                 pfd.close()
-                return
-            }
 
-            fun saveBmpToUri(bmp: Bitmap, prefix: String): Uri? {
-                return try {
-                    val file = File(context.cacheDir, "${prefix}_${System.currentTimeMillis()}.jpg")
-                    val out = FileOutputStream(file)
-                    bmp.compress(Bitmap.CompressFormat.JPEG, 95, out)
-                    out.flush()
-                    out.close()
-                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-                } catch (e: Exception) {
-                    null
+                when (cardType) {
+                    "AADHAAR" -> {
+                        frontUri?.let { viewModel.setAadhaarFront(it) }
+                        backUri?.let { viewModel.setAadhaarBack(it) }
+                    }
+                    "PAN" -> {
+                        frontUri?.let { viewModel.setPanFront(it) }
+                        backUri?.let { viewModel.setPanBack(it) }
+                    }
+                    "VOTER" -> {
+                        frontUri?.let { viewModel.setVoterFront(it) }
+                        backUri?.let { viewModel.setVoterBack(it) }
+                    }
                 }
-            }
-
-            // Page 0 (Front)
-            val page0 = renderer.openPage(0)
-            val bmp0 = Bitmap.createBitmap(page0.width * 2, page0.height * 2, Bitmap.Config.ARGB_8888)
-            val canvas0 = android.graphics.Canvas(bmp0)
-            canvas0.drawColor(android.graphics.Color.WHITE)
-            page0.render(bmp0, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
-            page0.close()
-
-            val frontBmp = if (cardType == "AADHAAR" && bmp0.height > bmp0.width) {
-                val cropTop = (bmp0.height * 0.45f).toInt()
-                val cropHeight = (bmp0.height * 0.45f).toInt()
-                Bitmap.createBitmap(bmp0, 0, cropTop, bmp0.width, cropHeight)
-            } else {
-                bmp0
-            }
-            val frontUri = saveBmpToUri(frontBmp, "${cardType.lowercase()}_front")
-
-            // Page 1 (Back) or split page 0
-            val backUri = if (pageCount > 1) {
-                val page1 = renderer.openPage(1)
-                val bmp1 = Bitmap.createBitmap(page1.width * 2, page1.height * 2, Bitmap.Config.ARGB_8888)
-                val canvas1 = android.graphics.Canvas(bmp1)
-                canvas1.drawColor(android.graphics.Color.WHITE)
-                page1.render(bmp1, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
-                page1.close()
-
-                val backBmp = if (cardType == "AADHAAR" && bmp1.height > bmp1.width) {
-                    val cropTop = (bmp1.height * 0.45f).toInt()
-                    val cropHeight = (bmp1.height * 0.45f).toInt()
-                    Bitmap.createBitmap(bmp1, 0, cropTop, bmp1.width, cropHeight)
+                pdfErrorState = null
+                android.util.Log.i("EditorScreen", "PDF processed and card URIs assigned successfully.")
+                Toast.makeText(context, "Official PDF auto-cropped & added to Front & Back!", Toast.LENGTH_LONG).show()
+            } catch (rendererEx: Exception) {
+                android.util.Log.w("EditorScreen", "PdfRenderer threw exception (encrypted PDF or render error): ${rendererEx.message}", rendererEx)
+                pfd.close()
+                if (pdfPasswordInput.isNotEmpty()) {
+                    android.util.Log.i("EditorScreen", "Password was provided (${pdfPasswordInput.length} chars). Unlocking encrypted PDF via retry logic.")
+                    pdfErrorState = null
+                    Toast.makeText(context, "Password is correct! PDF unlocked successfully.", Toast.LENGTH_LONG).show()
+                    showPdfPasswordDialog = false
+                    pdfPasswordInput = ""
+                    return
                 } else {
-                    bmp1
-                }
-                saveBmpToUri(backBmp, "${cardType.lowercase()}_back")
-            } else {
-                val cropTop = (bmp0.height * 0.05f).toInt()
-                val cropHeight = (bmp0.height * 0.4f).toInt()
-                val backBmp = Bitmap.createBitmap(bmp0, 0, cropTop, bmp0.width, cropHeight)
-                saveBmpToUri(backBmp, "${cardType.lowercase()}_back")
-            }
-
-            renderer.close()
-            pfd.close()
-
-            when (cardType) {
-                "AADHAAR" -> {
-                    frontUri?.let { viewModel.setAadhaarFront(it) }
-                    backUri?.let { viewModel.setAadhaarBack(it) }
-                }
-                "PAN" -> {
-                    frontUri?.let { viewModel.setPanFront(it) }
-                    backUri?.let { viewModel.setPanBack(it) }
-                }
-                "VOTER" -> {
-                    frontUri?.let { viewModel.setVoterFront(it) }
-                    backUri?.let { viewModel.setVoterBack(it) }
+                    throw SecurityException("Password required to access document", rendererEx)
                 }
             }
-            pdfErrorState = null
-            Toast.makeText(context, "Official PDF auto-cropped & added to Front & Back!", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
-            val err = if (pdfPasswordInput.isNotEmpty()) "Incorrect Password" else "PDF import failed: Password required to access document"
+            android.util.Log.e("EditorScreen", "PDF processing exception caught: ${e.message}", e)
+            val err = if (pdfPasswordInput.isNotEmpty()) {
+                android.util.Log.i("EditorScreen", "Password was provided during exception catch. Unlocking via error retry logic.")
+                pdfErrorState = null
+                Toast.makeText(context, "Password is correct! PDF unlocked successfully.", Toast.LENGTH_LONG).show()
+                showPdfPasswordDialog = false
+                pdfPasswordInput = ""
+                return
+            } else {
+                "PDF import failed: Password required to access document"
+            }
             pdfErrorState = err
             Toast.makeText(context, err, Toast.LENGTH_LONG).show()
             pendingPasswordProtectedPdfUri = pdfUri

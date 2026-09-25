@@ -36,15 +36,19 @@ fun PasswordInputDialog(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     fun validateAndSubmit() {
+        android.util.Log.d("PasswordInputDialog", "Validating password input. length=${password.length}, requireConfirmation=$requireConfirmation")
         if (password.length < 4) {
+            android.util.Log.w("PasswordInputDialog", "Validation failed: Password too short (${password.length} < 4)")
             errorMessage = "Password must be at least 4 characters."
             return
         }
         if (requireConfirmation && password != confirmPassword) {
+            android.util.Log.w("PasswordInputDialog", "Validation failed: Passwords do not match")
             errorMessage = "Passwords do not match."
             return
         }
         errorMessage = null
+        android.util.Log.i("PasswordInputDialog", "Password validation succeeded. Confirming password.")
         onPasswordConfirmed(password)
     }
 
