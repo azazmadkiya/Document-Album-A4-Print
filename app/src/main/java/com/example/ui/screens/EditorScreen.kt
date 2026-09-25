@@ -344,6 +344,8 @@ fun EditorScreen(
                     Toast.makeText(context, "Password is correct! PDF unlocked and cards populated successfully.", Toast.LENGTH_LONG).show()
                     showPdfPasswordDialog = false
                     pdfPasswordInput = ""
+                    pendingPasswordProtectedPdfUri = null
+                    pendingPasswordProtectedCardType = null
                     return
                 } else {
                     throw SecurityException("Password required to access document", rendererEx)
@@ -358,6 +360,8 @@ fun EditorScreen(
                 Toast.makeText(context, "Password is correct! PDF unlocked and cards populated successfully.", Toast.LENGTH_LONG).show()
                 showPdfPasswordDialog = false
                 pdfPasswordInput = ""
+                pendingPasswordProtectedPdfUri = null
+                pendingPasswordProtectedCardType = null
                 return
             }
             val err = "PDF import failed: Password required to access document"
