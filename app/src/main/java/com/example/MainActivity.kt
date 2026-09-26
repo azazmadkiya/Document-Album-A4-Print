@@ -15,10 +15,16 @@ import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.SplashScreen
 import com.example.ui.theme.MyApplicationTheme
 import com.example.ui.viewmodel.DocViewModel
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        try {
+            PDFBoxResourceLoader.init(applicationContext)
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "Failed to initialize PDFBoxResourceLoader", e)
+        }
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {

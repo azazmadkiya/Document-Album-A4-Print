@@ -213,7 +213,27 @@ fun ImageEditorDialog(
                         ) {
                             Icon(Icons.Default.Crop, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Crop Photo", fontWeight = FontWeight.Bold)
+                            Text("Manual Crop", fontWeight = FontWeight.Bold)
+                        }
+
+                        // CV Auto Detect Card & Crop Button
+                        Button(
+                            onClick = {
+                                currentBitmap?.let { bmp ->
+                                    val cropped = com.example.utils.DocumentEdgeDetector.cropToCard(bmp)
+                                    currentBitmap = cropped
+                                    rotationAngle = 0f
+                                    android.widget.Toast.makeText(context, "Card detected & cropped to boundaries!", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Auto Crop Card", fontWeight = FontWeight.Bold)
                         }
 
                         // Rotate Button
