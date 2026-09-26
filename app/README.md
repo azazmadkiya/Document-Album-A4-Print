@@ -1,44 +1,45 @@
-# Document Album A4 Print
+# A4 Document Studio
 
-**Document Album A4 Print** is a modern, offline-first Android application built with Kotlin and Jetpack Compose that allows users to scan, arrange, and format multiple identity cards and documents onto a single A4-sized layout for easy printing and sharing as high-quality PDFs.
+**A4 Document Studio** is a powerful, offline-first Android application built with Kotlin and Jetpack Compose designed to simplify document scanning, ID card arrangement, PDF generation, and secure document management.
 
 ---
 
-## 📱 Features
+## 🌟 Core Features
 
-- **Multi-ID & Document Scanning**: Scan and capture Aadhaar cards, PAN cards, Voter ID cards, Driving Licenses, student IDs, and cover documents (Front & Back alignment).
-- **Smart Edge Detection & Cropping**: Built-in document edge detector and interactive crop tool to clean up scanned documents.
-- **A4 Document Layout Generation**: Automatically arranges front and back card scans onto professional A4 page layouts.
-- **Local-First & Secure**: Powered by Room Database. All data, scans, and PDFs remain 100% private and stored locally on your device with no cloud tracking.
-- **PDF Export & Print**: Generate crisp, high-resolution PDF documents ready for wireless printing or sharing.
-- **Jetpack Compose UI**: Built using Material Design 3 (M3) components for a sleek, responsive, and accessible user experience.
+- **A4 Layout Management**: Arrange multiple ID cards (Aadhaar, PAN, Voter ID, Driving License, Student IDs) and documents (Front & Back) onto professional A4-sized grids and custom layouts.
+- **PDF Password Support**: Secure your exported PDF documents with custom encryption and password protection before sharing or printing.
+- **Smart Edge Detection & Cropping**: Automatically detect document boundaries and crop/clean scans for professional output.
+- **Image Filters & Editing**: Enhance scans with Black & White, Grayscale, or Color filters, contrast adjustments, and rotation.
+- **Local-First & Secure (Room Database)**: All your scanned documents, albums, and PDFs are stored securely and exclusively on your device using a local Room database with zero cloud tracking.
+- **High-Resolution PDF Export & Print**: Generate crisp A4 PDFs and send them directly to wireless printers or share via messaging and email.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Language**: Kotlin
-- **UI Framework**: Jetpack Compose & Material 3
+- **UI Framework**: Jetpack Compose & Material Design 3 (M3)
 - **Architecture**: MVVM (Model-View-ViewModel) with Kotlin Coroutines & Flows
-- **Local Storage**: Room Database (with KSP)
-- **PDF Rendering & Generation**: PdfBox-Android
+- **Database**: Room Database (with KSP)
+- **PDF Handling**: PdfBox-Android
 
 ---
 
 ## 🔒 Privacy Policy
 
-Our application respects your privacy. All documents and personal scans stay securely on your device. Read our full [Privacy Policy](https://azazmadkiya.github.io/Document-Album-A4-Print/).
+A4 Document Studio is 100% offline-first. Your documents never leave your device. Read our hosted [Privacy Policy](https://azazmadkiya.github.io/Document-Album-A4-Print/).
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Build Instructions
 
 1. Clone the repository:
    ```bash
    git clone https://github.com/azazmadkiya/Document-Album-A4-Print.git
    ```
 2. Open the project in **Android Studio Koala or newer**.
-3. Sync project with Gradle files and run on your emulator or physical device.
+3. Sync the project with Gradle files.
+4. Run the app on an Android emulator or physical device (`minSdk 24`, `targetSdk 36`).
 
 ---
 
