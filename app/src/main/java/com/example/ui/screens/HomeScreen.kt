@@ -25,6 +25,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.platform.testTag
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -33,6 +38,42 @@ fun HomeScreen(
     onSelectDocument: (DocumentEntity) -> Unit,
     onDeleteDocument: (DocumentEntity) -> Unit
 ) {
+    var showPrivacyPolicy by remember { mutableStateOf(false) }
+
+    if (showPrivacyPolicy) {
+        AlertDialog(
+            onDismissRequest = { showPrivacyPolicy = false },
+            title = { Text("Privacy Policy", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(350.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text("Effective Date: September 26, 2026\n", fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "Document Album A4 Print operates the Document Album A4 Print mobile application.\n\n" +
+                                "1. Information Collection and Use\n" +
+                                "All document scanning, image cropping, edge detection, and A4 page composition happen entirely on your device locally. We do not collect, store, transmit, or share any personal information, images, documents, or metadata on external servers.\n\n" +
+                                "2. Camera and Storage Permissions\n" +
+                                "Camera is used solely for capturing photos of ID cards and documents. Storage is used to select existing photos or save generated A4 PDFs locally.\n\n" +
+                                "3. Third-Party Services\n" +
+                                "Our application does not use external analytics trackers or advertising networks.\n\n" +
+                                "4. Contact Us\n" +
+                                "For questions, contact us at: azazmadkiya@gmail.com",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showPrivacyPolicy = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -47,6 +88,17 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text("Doc A4 Print & Crop", fontWeight = FontWeight.Bold)
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { showPrivacyPolicy = true },
+                        modifier = Modifier.testTag("privacy_policy_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Privacy Policy"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

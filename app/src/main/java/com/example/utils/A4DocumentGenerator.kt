@@ -58,6 +58,10 @@ object A4DocumentGenerator {
         panBackUri: Uri?,
         voterFrontUri: Uri?,
         voterBackUri: Uri?,
+        dlFrontUri: Uri? = null,
+        dlBackUri: Uri? = null,
+        studentFrontUri: Uri? = null,
+        studentBackUri: Uri? = null,
         coverFrontUri: Uri?,
         coverBackUri: Uri?,
         layoutStyle: String = "MULTI_ID_GRID",
@@ -79,6 +83,10 @@ object A4DocumentGenerator {
         var pB = loadBitmap(context, panBackUri)
         var vF = loadBitmap(context, voterFrontUri)
         var vB = loadBitmap(context, voterBackUri)
+        var dF = loadBitmap(context, dlFrontUri)
+        var dB = loadBitmap(context, dlBackUri)
+        var sF = loadBitmap(context, studentFrontUri)
+        var sB = loadBitmap(context, studentBackUri)
         var cF = loadBitmap(context, coverFrontUri)
         var cB = loadBitmap(context, coverBackUri)
 
@@ -89,46 +97,32 @@ object A4DocumentGenerator {
             pB = pB?.let { applyBwFilter(it) }
             vF = vF?.let { applyBwFilter(it) }
             vB = vB?.let { applyBwFilter(it) }
+            dF = dF?.let { applyBwFilter(it) }
+            dB = dB?.let { applyBwFilter(it) }
+            sF = sF?.let { applyBwFilter(it) }
+            sB = sB?.let { applyBwFilter(it) }
             cF = cF?.let { applyBwFilter(it) }
             cB = cB?.let { applyBwFilter(it) }
         }
 
-        if (layoutStyle == "MULTI_ID_GRID") {
-            drawMultiIdGrid(
-                canvas = canvas,
-                title = title,
-                panFront = pF,
-                panBack = pB,
-                voterFront = vF,
-                voterBack = vB,
-                aadhaarFront = aF,
-                aadhaarBack = aB,
-                coverFront = cF,
-                coverBack = cB,
-                showCutGuides = showCutGuides,
-                showLabels = showLabels,
-                showVerticalMargin = showVerticalMargin,
-                showHorizontalMargin = showHorizontalMargin,
-                cardScale = cardScale
-            )
-        } else if (layoutStyle == "MULTI_ID_GRID_CENTERED") {
-            drawCenteredMultiIdGrid(
-                canvas = canvas,
-                title = title,
-                panFront = pF,
-                panBack = pB,
-                voterFront = vF,
-                voterBack = vB,
-                aadhaarFront = aF,
-                aadhaarBack = aB,
-                coverFront = cF,
-                coverBack = cB,
-                showCutGuides = showCutGuides,
-                showLabels = showLabels,
-                showVerticalMargin = showVerticalMargin,
-                showHorizontalMargin = showHorizontalMargin,
-                cardScale = cardScale
-            )
+        if (layoutStyle == "MULTI_ID_GRID" || layoutStyle == "MULTI_ID_GRID_CENTERED") {
+            val pairs = mutableListOf<Pair<Bitmap?, Bitmap?>>()
+            if (pF != null || pB != null) pairs.add(Pair(pF, pB))
+            if (vF != null || vB != null) pairs.add(Pair(vF, vB))
+            if (aF != null || aB != null) pairs.add(Pair(aF, aB))
+            if (dF != null || dB != null) pairs.add(Pair(dF, dB))
+            if (sF != null || sB != null) pairs.add(Pair(sF, sB))
+            if (cF != null || cB != null) pairs.add(Pair(cF, cB))
+
+            if (pairs.isEmpty()) {
+                pairs.add(Pair(pF, pB))
+            }
+
+            if (layoutStyle == "MULTI_ID_GRID") {
+                drawMultiIdGridCustom(canvas, pairs, showCutGuides, showLabels, showVerticalMargin, showHorizontalMargin, cardScale)
+            } else {
+                drawCenteredMultiIdGridCustom(canvas, pairs, showCutGuides, showLabels, showVerticalMargin, showHorizontalMargin, cardScale)
+            }
         } else {
             val baseTargetW = (cardPrintSize.widthMm * MM_TO_PX).toInt()
             drawStackedCards(
@@ -148,54 +142,37 @@ object A4DocumentGenerator {
         return bitmap
     }
 
-    private fun drawMultiIdGrid(
+    private fun drawMultiIdGridCustom(
         canvas: Canvas,
-        title: String,
-        panFront: Bitmap?,
-        panBack: Bitmap?,
-        voterFront: Bitmap?,
-        voterBack: Bitmap?,
-        aadhaarFront: Bitmap?,
-        aadhaarBack: Bitmap?,
-        coverFront: Bitmap?,
-        coverBack: Bitmap?,
+        pairs: List<Pair<Bitmap?, Bitmap?>>,
         showCutGuides: Boolean,
         showLabels: Boolean,
         showVerticalMargin: Boolean,
         showHorizontalMargin: Boolean,
         cardScale: Float
     ) {
-        val numRows = 4
-
-        // CR80 ID Card physical dimensions: 85.6 mm x 53.98 mm
+        val numRows = max(1, pairs.size)
         val cardWidthMm = 85.6f * cardScale
-        val cardHeightMm = 53.98f * cardScale
+        val maxAllowedH = (A4_HEIGHT_PX.toFloat() - 120f) / numRows / MM_TO_PX
+        val cardHeightMm = min(53.98f * cardScale, maxAllowedH * cardScale)
 
         val cardW = cardWidthMm * MM_TO_PX
         val cardH = cardHeightMm * MM_TO_PX
 
-        val hGap = if (showHorizontalMargin) 40f else 0f
+        val hGap = if (showHorizontalMargin) 40f else 20f
         val totalGridW = (cardW * 2f) + hGap
         val startX = if (showHorizontalMargin) {
             80f
         } else {
-            ((A4_WIDTH_PX.toFloat() - totalGridW) / 2f).coerceAtLeast(0f)
+            ((A4_WIDTH_PX.toFloat() - totalGridW) / 2f).coerceAtLeast(20f)
         }
 
         val startY = if (showVerticalMargin) 80f else 60f
-        val vGap = if (showVerticalMargin) 40f else 0f
+        val vGap = if (showVerticalMargin) 40f else 15f
 
-        val rowPairs = listOf(
-            Pair(panFront, rotateBitmap180(aadhaarBack)),
-            Pair(panBack, rotateBitmap180(aadhaarFront)),
-            Pair(voterFront, rotateBitmap180(coverBack)),
-            Pair(voterBack, rotateBitmap180(coverFront))
-        )
-
-        rowPairs.forEachIndexed { index, (leftBmp, rightBmp) ->
+        pairs.forEachIndexed { index, (leftBmp, rightBmp) ->
             val cardTop = startY + (index * (cardH + vGap))
 
-            // Left card
             drawCardItem(
                 canvas = canvas,
                 bmp = leftBmp,
@@ -206,11 +183,10 @@ object A4DocumentGenerator {
                 showCutGuides = showCutGuides
             )
 
-            // Right card (rotated 180 degrees)
             val backLeft = startX + cardW + hGap
             drawCardItem(
                 canvas = canvas,
-                bmp = rightBmp,
+                bmp = rotateBitmap180(rightBmp),
                 left = backLeft,
                 top = cardTop,
                 width = cardW,
@@ -220,27 +196,18 @@ object A4DocumentGenerator {
         }
     }
 
-    private fun drawCenteredMultiIdGrid(
+    private fun drawCenteredMultiIdGridCustom(
         canvas: Canvas,
-        title: String,
-        panFront: Bitmap?,
-        panBack: Bitmap?,
-        voterFront: Bitmap?,
-        voterBack: Bitmap?,
-        aadhaarFront: Bitmap?,
-        aadhaarBack: Bitmap?,
-        coverFront: Bitmap?,
-        coverBack: Bitmap?,
+        pairs: List<Pair<Bitmap?, Bitmap?>>,
         showCutGuides: Boolean,
         showLabels: Boolean,
         showVerticalMargin: Boolean,
         showHorizontalMargin: Boolean,
         cardScale: Float
     ) {
-        val numRows = 4
-        // Official portrait ID card dimensions: Width = 54 mm (5.4 cm), Height = 85.6 mm (8.5 cm)
+        val numRows = max(1, pairs.size)
         val cardWidthMm = 54.0f * cardScale
-        val maxAllowedH = (A4_HEIGHT_PX.toFloat() - 100f) / numRows / MM_TO_PX
+        val maxAllowedH = (A4_HEIGHT_PX.toFloat() - 120f) / numRows / MM_TO_PX
         val cardHeightMm = min(85.6f * cardScale, maxAllowedH * cardScale)
         val cardW = cardWidthMm * MM_TO_PX
         val cardH = cardHeightMm * MM_TO_PX
@@ -251,17 +218,9 @@ object A4DocumentGenerator {
         val startX = (A4_WIDTH_PX.toFloat() - totalGridW) / 2f
         val startY = (A4_HEIGHT_PX.toFloat() - totalGridH) / 2f
 
-        val rowPairs = listOf(
-            Pair(panFront, rotateBitmap180(aadhaarBack)),
-            Pair(panBack, rotateBitmap180(aadhaarFront)),
-            Pair(voterFront, rotateBitmap180(coverBack)),
-            Pair(voterBack, rotateBitmap180(coverFront))
-        )
-
-        rowPairs.forEachIndexed { index, (leftBmp, rightBmp) ->
+        pairs.forEachIndexed { index, (leftBmp, rightBmp) ->
             val cardTop = startY + (index * (cardH + vGap))
 
-            // Left card
             drawCardItem(
                 canvas = canvas,
                 bmp = leftBmp,
@@ -272,11 +231,10 @@ object A4DocumentGenerator {
                 showCutGuides = showCutGuides
             )
 
-            // Right card (rotated 180 degrees)
             val backLeft = startX + cardW + hGap
             drawCardItem(
                 canvas = canvas,
-                bmp = rightBmp,
+                bmp = rotateBitmap180(rightBmp),
                 left = backLeft,
                 top = cardTop,
                 width = cardW,

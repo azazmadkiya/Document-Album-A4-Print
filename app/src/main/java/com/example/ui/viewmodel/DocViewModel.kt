@@ -17,10 +17,10 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
 
     val allDocuments: Flow<List<DocumentEntity>> = dao.getAllDocuments()
 
-    private val _docTitle = MutableStateFlow("My ID Document Album")
+    private val _docTitle = MutableStateFlow("A4 Document Studio Album")
     val docTitle: StateFlow<String> = _docTitle.asStateFlow()
 
-    // 4 Documents: Aadhaar, PAN, Voter ID, Cover Photo (Front & Back)
+    // ID Cards: Aadhaar, PAN, Voter ID, Driving License, Student/Employee ID, Cover Photo (Front & Back)
     private val _aadhaarFront = MutableStateFlow<Uri?>(null)
     val aadhaarFront: StateFlow<Uri?> = _aadhaarFront.asStateFlow()
     private val _aadhaarBack = MutableStateFlow<Uri?>(null)
@@ -35,6 +35,16 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
     val voterFront: StateFlow<Uri?> = _voterFront.asStateFlow()
     private val _voterBack = MutableStateFlow<Uri?>(null)
     val voterBack: StateFlow<Uri?> = _voterBack.asStateFlow()
+
+    private val _dlFront = MutableStateFlow<Uri?>(null)
+    val dlFront: StateFlow<Uri?> = _dlFront.asStateFlow()
+    private val _dlBack = MutableStateFlow<Uri?>(null)
+    val dlBack: StateFlow<Uri?> = _dlBack.asStateFlow()
+
+    private val _studentFront = MutableStateFlow<Uri?>(null)
+    val studentFront: StateFlow<Uri?> = _studentFront.asStateFlow()
+    private val _studentBack = MutableStateFlow<Uri?>(null)
+    val studentBack: StateFlow<Uri?> = _studentBack.asStateFlow()
 
     private val _coverFront = MutableStateFlow<Uri?>(null)
     val coverFront: StateFlow<Uri?> = _coverFront.asStateFlow()
@@ -75,6 +85,10 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
     fun setPanBack(uri: Uri?) { _panBack.value = uri }
     fun setVoterFront(uri: Uri?) { _voterFront.value = uri }
     fun setVoterBack(uri: Uri?) { _voterBack.value = uri }
+    fun setDlFront(uri: Uri?) { _dlFront.value = uri }
+    fun setDlBack(uri: Uri?) { _dlBack.value = uri }
+    fun setStudentFront(uri: Uri?) { _studentFront.value = uri }
+    fun setStudentBack(uri: Uri?) { _studentBack.value = uri }
     fun setCoverFront(uri: Uri?) { _coverFront.value = uri }
     fun setCoverBack(uri: Uri?) { _coverBack.value = uri }
 
@@ -111,7 +125,7 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun saveDocument(onSaved: (Long) -> Unit) {
-        val title = _docTitle.value.ifBlank { "ID Document Album" }
+        val title = _docTitle.value.ifBlank { "A4 Document Album" }
         viewModelScope.launch {
             val entity = DocumentEntity(
                 title = title,
@@ -123,8 +137,10 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
                 panBack = _panBack.value?.toString() ?: "",
                 voterFront = _voterFront.value?.toString() ?: "",
                 voterBack = _voterBack.value?.toString() ?: "",
-                dlFront = "",
-                dlBack = "",
+                dlFront = _dlFront.value?.toString() ?: "",
+                dlBack = _dlBack.value?.toString() ?: "",
+                studentFront = _studentFront.value?.toString() ?: "",
+                studentBack = _studentBack.value?.toString() ?: "",
                 coverFront = _coverFront.value?.toString() ?: "",
                 coverBack = _coverBack.value?.toString() ?: "",
                 layoutStyle = _layoutStyle.value,
@@ -149,20 +165,28 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
         _panBack.value = if (entity.panBack.isNotBlank()) Uri.parse(entity.panBack) else null
         _voterFront.value = if (entity.voterFront.isNotBlank()) Uri.parse(entity.voterFront) else null
         _voterBack.value = if (entity.voterBack.isNotBlank()) Uri.parse(entity.voterBack) else null
-        _coverFront.value = if (entity.coverFront.isNotBlank()) Uri.parse(entity.coverFront) else if (entity.dlFront.isNotBlank()) Uri.parse(entity.dlFront) else null
-        _coverBack.value = if (entity.coverBack.isNotBlank()) Uri.parse(entity.coverBack) else if (entity.dlBack.isNotBlank()) Uri.parse(entity.dlBack) else null
+        _dlFront.value = if (entity.dlFront.isNotBlank()) Uri.parse(entity.dlFront) else null
+        _dlBack.value = if (entity.dlBack.isNotBlank()) Uri.parse(entity.dlBack) else null
+        _studentFront.value = if (entity.studentFront.isNotBlank()) Uri.parse(entity.studentFront) else null
+        _studentBack.value = if (entity.studentBack.isNotBlank()) Uri.parse(entity.studentBack) else null
+        _coverFront.value = if (entity.coverFront.isNotBlank()) Uri.parse(entity.coverFront) else null
+        _coverBack.value = if (entity.coverBack.isNotBlank()) Uri.parse(entity.coverBack) else null
         _layoutStyle.value = entity.layoutStyle
         _filterType.value = entity.filterType
     }
 
     fun clearCurrent() {
-        _docTitle.value = "My ID Document Album"
+        _docTitle.value = "A4 Document Studio Album"
         _aadhaarFront.value = null
         _aadhaarBack.value = null
         _panFront.value = null
         _panBack.value = null
         _voterFront.value = null
         _voterBack.value = null
+        _dlFront.value = null
+        _dlBack.value = null
+        _studentFront.value = null
+        _studentBack.value = null
         _coverFront.value = null
         _coverBack.value = null
         _layoutStyle.value = "MULTI_ID_GRID"
@@ -185,6 +209,18 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
         val temp = _voterFront.value
         _voterFront.value = _voterBack.value
         _voterBack.value = temp
+    }
+
+    fun swapDlSides() {
+        val temp = _dlFront.value
+        _dlFront.value = _dlBack.value
+        _dlBack.value = temp
+    }
+
+    fun swapStudentSides() {
+        val temp = _studentFront.value
+        _studentFront.value = _studentBack.value
+        _studentBack.value = temp
     }
 
     fun swapCoverSides() {

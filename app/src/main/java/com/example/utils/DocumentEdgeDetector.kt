@@ -406,73 +406,81 @@ object DocumentEdgeDetector {
      * - Back Card (Address, QR Code, UIDAI Helpline)
      */
     fun extractAadhaarFrontAndBackFromPage(pageBitmap: Bitmap): Pair<Bitmap, Bitmap>? {
-        val w = pageBitmap.width
-        val h = pageBitmap.height
+        return try {
+            val w = pageBitmap.width
+            val h = pageBitmap.height
+            if (w <= 0 || h <= 0) return null
 
-        if (h <= w) {
-            // Already landscape: split left and right and classify
-            val halfW = w / 2
-            val leftCard = Bitmap.createBitmap(pageBitmap, 0, 0, halfW, h)
-            val rightCard = Bitmap.createBitmap(pageBitmap, halfW, 0, w - halfW, h)
-            val leftSide = classifyCardSide(leftCard)
-            val rightSide = classifyCardSide(rightCard)
-            val front: Bitmap
-            val back: Bitmap
-            if (leftSide == CardSide.FRONT) {
-                front = leftCard
-                back = rightCard
-            } else if (rightSide == CardSide.FRONT) {
-                front = rightCard
-                back = leftCard
+            if (h <= w) {
+                // Already landscape: split left and right and classify
+                val halfW = (w / 2).coerceIn(1, w - 1)
+                val leftCard = Bitmap.createBitmap(pageBitmap, 0, 0, halfW, h)
+                val rightCard = Bitmap.createBitmap(pageBitmap, halfW, 0, w - halfW, h)
+                val leftSide = classifyCardSide(leftCard)
+                val rightSide = classifyCardSide(rightCard)
+                val front: Bitmap
+                val back: Bitmap
+                if (leftSide == CardSide.FRONT) {
+                    front = leftCard
+                    back = rightCard
+                } else if (rightSide == CardSide.FRONT) {
+                    front = rightCard
+                    back = leftCard
+                } else {
+                    front = leftCard
+                    back = rightCard
+                }
+                Pair(front, back)
             } else {
-                front = leftCard
-                back = rightCard
+                // Full portrait page (A4):
+                val result = detectCardBoundaries(pageBitmap)
+                val cardRect = result.pixelRect
+
+                val cardTop = if (cardRect.top > h * 0.45f && cardRect.top < h - 100) {
+                    cardRect.top
+                } else {
+                    (h * 0.58f).toInt().coerceIn(0, h - 100)
+                }
+
+                val cardBottom = min(h, max(cardTop + 100, (cardTop + h * 0.40f).toInt()))
+                val cardHeight = (cardBottom - cardTop).coerceIn(50, h - cardTop)
+                val safeTop = cardTop.coerceIn(0, max(0, h - 50))
+                val safeHeight = cardHeight.coerceIn(50, h - safeTop)
+
+                val cardSection = Bitmap.createBitmap(pageBitmap, 0, safeTop, w, safeHeight)
+
+                // Split into Left and Right halves
+                val secW = cardSection.width
+                val secH = cardSection.height
+                val halfW = (secW / 2).coerceIn(1, secW - 1)
+                val leftCard = Bitmap.createBitmap(cardSection, 0, 0, halfW, secH)
+                val rightCard = Bitmap.createBitmap(cardSection, halfW, 0, secW - halfW, secH)
+
+                // Classification step to verify Front vs Back and prevent swap errors
+                val leftSide = classifyCardSide(leftCard)
+                val rightSide = classifyCardSide(rightCard)
+
+                val frontCard: Bitmap
+                val backCard: Bitmap
+
+                if (leftSide == CardSide.FRONT) {
+                    frontCard = leftCard
+                    backCard = rightCard
+                } else if (rightSide == CardSide.FRONT) {
+                    frontCard = rightCard
+                    backCard = leftCard
+                } else {
+                    // Standard UIDAI e-Aadhaar layout: Left is Front, Right is Back
+                    frontCard = leftCard
+                    backCard = rightCard
+                }
+
+                try { cardSection.recycle() } catch (_: Exception) {}
+                Pair(frontCard, backCard)
             }
-            return Pair(front, back)
+        } catch (e: Exception) {
+            android.util.Log.e("DocumentEdgeDetector", "extractAadhaarFrontAndBackFromPage failed", e)
+            null
         }
-
-        // Full portrait page (A4):
-        val result = detectCardBoundaries(pageBitmap)
-        val cardRect = result.pixelRect
-
-        val cardTop = if (cardRect.top > h * 0.45f) {
-            cardRect.top
-        } else {
-            (h * 0.58f).toInt().coerceIn(0, h - 100)
-        }
-
-        val cardBottom = min(h, max(cardTop + 100, (cardTop + h * 0.40f).toInt()))
-        val cardHeight = cardBottom - cardTop
-        val cardWidth = w
-
-        val cardSection = Bitmap.createBitmap(pageBitmap, 0, cardTop, cardWidth, cardHeight)
-
-        // Split into Left and Right halves
-        val halfW = cardSection.width / 2
-        val leftCard = Bitmap.createBitmap(cardSection, 0, 0, halfW, cardSection.height)
-        val rightCard = Bitmap.createBitmap(cardSection, halfW, 0, cardSection.width - halfW, cardSection.height)
-
-        // Classification step to verify Front vs Back and prevent swap errors
-        val leftSide = classifyCardSide(leftCard)
-        val rightSide = classifyCardSide(rightCard)
-
-        val frontCard: Bitmap
-        val backCard: Bitmap
-
-        if (leftSide == CardSide.FRONT) {
-            frontCard = leftCard
-            backCard = rightCard
-        } else if (rightSide == CardSide.FRONT) {
-            frontCard = rightCard
-            backCard = leftCard
-        } else {
-            // Standard UIDAI e-Aadhaar layout: Left is Front, Right is Back
-            frontCard = leftCard
-            backCard = rightCard
-        }
-
-        cardSection.recycle()
-
-        return Pair(frontCard, backCard)
     }
 }

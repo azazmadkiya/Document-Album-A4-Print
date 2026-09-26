@@ -17,6 +17,8 @@ data class DocumentEntity(
     val voterBack: String = "",
     val dlFront: String = "",
     val dlBack: String = "",
+    val studentFront: String = "",
+    val studentBack: String = "",
     val coverFront: String = "",
     val coverBack: String = "",
     val layoutStyle: String = "MULTI_ID_GRID",
