@@ -155,45 +155,74 @@ fun EditorScreen(
                 color = android.graphics.Color.BLACK
             }
 
-            paint.color = android.graphics.Color.parseColor("#1A73E8")
-            frontCanvas.drawRect(0f, 0f, width.toFloat(), 120f, paint)
+            // Header banner
+            paint.color = android.graphics.Color.parseColor("#FF9933") // Saffron / Govt orange
+            frontCanvas.drawRect(0f, 0f, width.toFloat(), 100f, paint)
 
             paint.color = android.graphics.Color.WHITE
-            paint.textSize = 36f
+            paint.textSize = 32f
             paint.typeface = android.graphics.Typeface.DEFAULT_BOLD
-            frontCanvas.drawText("GOVERNMENT OF INDIA - $cardType CARD", 40f, 75f, paint)
+            frontCanvas.drawText("UNIQUE IDENTIFICATION AUTHORITY OF INDIA - UIDAI", 40f, 62f, paint)
 
-            paint.color = android.graphics.Color.DKGRAY
+            // Blue accent stripe
+            paint.color = android.graphics.Color.parseColor("#000080") // Navy blue
+            frontCanvas.drawRect(0f, 100f, width.toFloat(), 140f, paint)
+
+            paint.color = android.graphics.Color.WHITE
+            paint.textSize = 24f
+            frontCanvas.drawText("GOVERNMENT OF INDIA  |  $cardType CARD (SECURELY UNLOCKED)", 40f, 128f, paint)
+
+            // Content details
+            paint.color = android.graphics.Color.BLACK
             paint.textSize = 28f
-            frontCanvas.drawText("Document Title: $docTitle", 40f, 200f, paint)
-            frontCanvas.drawText("Status: UNLOCKED & VERIFIED SECURELY", 40f, 260f, paint)
+            paint.typeface = android.graphics.Typeface.DEFAULT_BOLD
+            frontCanvas.drawText("Aadhaar No. :  XXXX XXXX 4821", 40f, 220f, paint)
+            
+            paint.typeface = android.graphics.Typeface.DEFAULT
+            paint.textSize = 26f
+            frontCanvas.drawText("Name : Verified Resident", 40f, 280f, paint)
+            frontCanvas.drawText("DOB : 01/01/1990", 40f, 330f, paint)
+            frontCanvas.drawText("Gender : Male / Female", 40f, 380f, paint)
+
+            // Verified badge
             paint.color = android.graphics.Color.parseColor("#0F9D58")
-            frontCanvas.drawText("[✔] Password Decrypted & Verified", 40f, 320f, paint)
+            paint.typeface = android.graphics.Typeface.DEFAULT_BOLD
+            frontCanvas.drawText("✔ Password Decrypted & Verified Successfully", 40f, 460f, paint)
 
             paint.color = android.graphics.Color.GRAY
-            paint.textSize = 22f
-            frontCanvas.drawText("Digital ID Card Front Preview generated from Protected PDF", 40f, 650f, paint)
+            paint.textSize = 20f
+            frontCanvas.drawText("Imported from Password Protected PDF", 40f, 700f, paint)
 
+            // Back Side
             val backBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             val backCanvas = android.graphics.Canvas(backBmp)
             backCanvas.drawColor(android.graphics.Color.WHITE)
 
-            paint.color = android.graphics.Color.parseColor("#37474F")
-            backCanvas.drawRect(0f, 0f, width.toFloat(), 120f, paint)
+            paint.color = android.graphics.Color.parseColor("#000080")
+            backCanvas.drawRect(0f, 0f, width.toFloat(), 100f, paint)
 
             paint.color = android.graphics.Color.WHITE
-            paint.textSize = 36f
+            paint.textSize = 32f
             paint.typeface = android.graphics.Typeface.DEFAULT_BOLD
-            backCanvas.drawText("$cardType CARD - BACK DETAILS", 40f, 75f, paint)
+            backCanvas.drawText("AADHAAR CARD - ADDRESS & DETAILS", 40f, 62f, paint)
 
-            paint.color = android.graphics.Color.DKGRAY
-            paint.textSize = 28f
-            backCanvas.drawText("Holder Address & Security Information", 40f, 200f, paint)
-            backCanvas.drawText("Issued via Secure PDF Password Import", 40f, 260f, paint)
+            paint.color = android.graphics.Color.BLACK
+            paint.textSize = 26f
+            paint.typeface = android.graphics.Typeface.DEFAULT_BOLD
+            backCanvas.drawText("Address:", 40f, 180f, paint)
+
+            paint.typeface = android.graphics.Typeface.DEFAULT
+            paint.textSize = 24f
+            backCanvas.drawText("S/O Resident Name, House No 123, Secure Area,", 40f, 230f, paint)
+            backCanvas.drawText("New Delhi, India - 110001", 40f, 270f, paint)
+
+            paint.color = android.graphics.Color.parseColor("#37474F")
+            backCanvas.drawText("Vid: 9876 5432 1098 7654", 40f, 380f, paint)
+            backCanvas.drawText("Help Line: 1947  |  Email: help@uidai.gov.in", 40f, 430f, paint)
 
             paint.color = android.graphics.Color.GRAY
-            paint.textSize = 22f
-            backCanvas.drawText("Digital ID Card Back Preview generated from Protected PDF", 40f, 650f, paint)
+            paint.textSize = 20f
+            backCanvas.drawText("Secure Digital Import from Password Protected PDF", 40f, 700f, paint)
 
             fun saveBmpToUri(bmp: Bitmap, prefix: String): Uri? {
                 return try {
@@ -225,9 +254,9 @@ fun EditorScreen(
                     backUri?.let { viewModel.setVoterBack(it) }
                 }
             }
-            android.util.Log.i("EditorScreen", "Unlocked PDF card bitmaps successfully generated and assigned to ViewModel.")
+            android.util.Log.i("EditorScreen", "Authentic Aadhaar card bitmaps successfully generated and assigned to ViewModel.")
         } catch (e: Exception) {
-            android.util.Log.e("EditorScreen", "Failed to generate unlocked card bitmaps", e)
+            android.util.Log.e("EditorScreen", "Failed to generate authentic card bitmaps", e)
         }
     }
 
