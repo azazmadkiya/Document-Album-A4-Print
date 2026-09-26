@@ -168,4 +168,28 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
         _layoutStyle.value = "MULTI_ID_GRID"
         _filterType.value = "COLOR"
     }
+
+    fun swapAadhaarSides() {
+        val temp = _aadhaarFront.value
+        _aadhaarFront.value = _aadhaarBack.value
+        _aadhaarBack.value = temp
+    }
+
+    fun swapPanSides() {
+        val temp = _panFront.value
+        _panFront.value = _panBack.value
+        _panBack.value = temp
+    }
+
+    fun swapVoterSides() {
+        val temp = _voterFront.value
+        _voterFront.value = _voterBack.value
+        _voterBack.value = temp
+    }
+
+    fun swapCoverSides() {
+        val temp = _coverFront.value
+        _coverFront.value = _coverBack.value
+        _coverBack.value = temp
+    }
 }

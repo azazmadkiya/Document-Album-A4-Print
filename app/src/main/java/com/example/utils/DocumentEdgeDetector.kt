@@ -338,10 +338,70 @@ object DocumentEdgeDetector {
         )
     }
 
+    enum class CardSide {
+        FRONT, BACK, UNKNOWN
+    }
+
+    /**
+     * Lightweight classification algorithm to verify whether a card image is Front or Back
+     * by analyzing color signatures, photo box presence, and QR code high-frequency texture density.
+     */
+    fun classifyCardSide(bitmap: Bitmap): CardSide {
+        val w = bitmap.width
+        val h = bitmap.height
+        if (w < 20 || h < 20) return CardSide.UNKNOWN
+
+        val sampleW = 120
+        val sampleH = (120f * h / w).toInt().coerceIn(40, 200)
+        val scaled = Bitmap.createScaledBitmap(bitmap, sampleW, sampleH, true)
+        val pixels = IntArray(sampleW * sampleH)
+        scaled.getPixels(pixels, 0, sampleW, 0, 0, sampleW, sampleH)
+        if (scaled != bitmap) scaled.recycle()
+
+        var frontScore = 0f
+        var backScore = 0f
+        var qrTextureCount = 0
+        var photoBoxLikeCount = 0
+
+        for (y in 2 until sampleH - 2) {
+            val row = y * sampleW
+            for (x in 2 until sampleW - 2) {
+                val p = pixels[row + x]
+                val r = AndroidColor.red(p)
+                val g = AndroidColor.green(p)
+                val b = AndroidColor.blue(p)
+
+                // Saffron header (Front)
+                if (r > 160 && g in 70..175 && b < 100) {
+                    frontScore += 1.5f
+                }
+                // High contrast texture grid (QR code on Back)
+                val pRight = pixels[row + x + 1]
+                val diff = abs(r - AndroidColor.red(pRight)) + abs(g - AndroidColor.green(pRight)) + abs(b - AndroidColor.blue(pRight))
+                if (diff > 180 && x > sampleW * 0.4f) {
+                    qrTextureCount++
+                }
+                // Skin tone / photo box region (Front)
+                if (r > 95 && g > 40 && b > 20 && r > g && r > b && abs(r - g) > 15 && x < sampleW * 0.5f) {
+                    photoBoxLikeCount++
+                }
+            }
+        }
+
+        if (qrTextureCount > (sampleW * sampleH * 0.08f)) {
+            backScore += 3.0f
+        }
+        if (photoBoxLikeCount > (sampleW * sampleH * 0.03f)) {
+            frontScore += 2.5f
+        }
+
+        return if (frontScore >= backScore) CardSide.FRONT else CardSide.BACK
+    }
+
     /**
      * Specialized Computer Vision Extractor for Full-Page e-Aadhaar letters (e.g., from PDF or camera scans):
      * Automatically locates the Aadhaar card cut-out section at the bottom of the page,
-     * isolates it, and segments it into:
+     * isolates it, classifies left/right halves using lightweight feature matching, and segments them into:
      * - Front Card (Photo, Name, DOB, Aadhaar Number)
      * - Back Card (Address, QR Code, UIDAI Helpline)
      */
@@ -350,15 +410,28 @@ object DocumentEdgeDetector {
         val h = pageBitmap.height
 
         if (h <= w) {
-            // Already landscape: split left and right
+            // Already landscape: split left and right and classify
             val halfW = w / 2
-            val front = Bitmap.createBitmap(pageBitmap, halfW, 0, w - halfW, h)
-            val back = Bitmap.createBitmap(pageBitmap, 0, 0, halfW, h)
+            val leftCard = Bitmap.createBitmap(pageBitmap, 0, 0, halfW, h)
+            val rightCard = Bitmap.createBitmap(pageBitmap, halfW, 0, w - halfW, h)
+            val leftSide = classifyCardSide(leftCard)
+            val rightSide = classifyCardSide(rightCard)
+            val front: Bitmap
+            val back: Bitmap
+            if (leftSide == CardSide.FRONT) {
+                front = leftCard
+                back = rightCard
+            } else if (rightSide == CardSide.FRONT) {
+                front = rightCard
+                back = leftCard
+            } else {
+                front = leftCard
+                back = rightCard
+            }
             return Pair(front, back)
         }
 
         // Full portrait page (A4):
-        // Locate bottom card cut-out using gradient line analysis
         val result = detectCardBoundaries(pageBitmap)
         val cardRect = result.pixelRect
 
@@ -374,10 +447,29 @@ object DocumentEdgeDetector {
 
         val cardSection = Bitmap.createBitmap(pageBitmap, 0, cardTop, cardWidth, cardHeight)
 
-        // Split into Left (Back side) and Right (Front side)
+        // Split into Left and Right halves
         val halfW = cardSection.width / 2
-        val backCard = Bitmap.createBitmap(cardSection, 0, 0, halfW, cardSection.height)
-        val frontCard = Bitmap.createBitmap(cardSection, halfW, 0, cardSection.width - halfW, cardSection.height)
+        val leftCard = Bitmap.createBitmap(cardSection, 0, 0, halfW, cardSection.height)
+        val rightCard = Bitmap.createBitmap(cardSection, halfW, 0, cardSection.width - halfW, cardSection.height)
+
+        // Classification step to verify Front vs Back and prevent swap errors
+        val leftSide = classifyCardSide(leftCard)
+        val rightSide = classifyCardSide(rightCard)
+
+        val frontCard: Bitmap
+        val backCard: Bitmap
+
+        if (leftSide == CardSide.FRONT) {
+            frontCard = leftCard
+            backCard = rightCard
+        } else if (rightSide == CardSide.FRONT) {
+            frontCard = rightCard
+            backCard = leftCard
+        } else {
+            // Standard UIDAI e-Aadhaar layout: Left is Front, Right is Back
+            frontCard = leftCard
+            backCard = rightCard
+        }
 
         cardSection.recycle()
 

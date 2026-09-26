@@ -303,8 +303,8 @@ fun EditorScreen(
                         val cardHeight = (bmp0.height * 0.40f).toInt().coerceIn(50, bmp0.height - cardTop)
                         val halfWidth = bmp0.width / 2
 
-                        frontBmp = Bitmap.createBitmap(bmp0, halfWidth, cardTop, bmp0.width - halfWidth, cardHeight)
-                        backBmp = Bitmap.createBitmap(bmp0, 0, cardTop, halfWidth, cardHeight)
+                        frontBmp = Bitmap.createBitmap(bmp0, 0, cardTop, halfWidth, cardHeight)
+                        backBmp = Bitmap.createBitmap(bmp0, halfWidth, cardTop, bmp0.width - halfWidth, cardHeight)
                     } else {
                         // Landscape Aadhaar: split left & right
                         val halfWidth = bmp0.width / 2
@@ -572,6 +572,10 @@ fun EditorScreen(
                         onClearBack = { viewModel.setAadhaarBack(null) },
                         onUploadPdf = { launchPdfPicker("AADHAAR") },
                         pdfErrorState = pdfErrorState,
+                        onSwapSides = {
+                            viewModel.swapAadhaarSides()
+                            Toast.makeText(context, "Front & Back Swapped", Toast.LENGTH_SHORT).show()
+                        },
                         onNext = { selectedTab = 1 }
                     )
                 }
@@ -618,6 +622,10 @@ fun EditorScreen(
                         onClearBack = { viewModel.setPanBack(null) },
                         onUploadPdf = { launchPdfPicker("PAN") },
                         pdfErrorState = pdfErrorState,
+                        onSwapSides = {
+                            viewModel.swapPanSides()
+                            Toast.makeText(context, "Front & Back Swapped", Toast.LENGTH_SHORT).show()
+                        },
                         onNext = { selectedTab = 2 }
                     )
                 }
@@ -664,6 +672,10 @@ fun EditorScreen(
                         onClearBack = { viewModel.setVoterBack(null) },
                         onUploadPdf = { launchPdfPicker("VOTER") },
                         pdfErrorState = pdfErrorState,
+                        onSwapSides = {
+                            viewModel.swapVoterSides()
+                            Toast.makeText(context, "Front & Back Swapped", Toast.LENGTH_SHORT).show()
+                        },
                         onNext = { selectedTab = 3 }
                     )
                 }
@@ -708,6 +720,10 @@ fun EditorScreen(
                             }
                         },
                         onClearBack = { viewModel.setCoverBack(null) },
+                        onSwapSides = {
+                            viewModel.swapCoverSides()
+                            Toast.makeText(context, "Front & Back Swapped", Toast.LENGTH_SHORT).show()
+                        },
                         onNext = { selectedTab = 4 }
                     )
                 }
@@ -978,6 +994,7 @@ fun CardDocumentSection(
     onClearBack: () -> Unit,
     onUploadPdf: (() -> Unit)? = null,
     pdfErrorState: String? = null,
+    onSwapSides: (() -> Unit)? = null,
     onNext: () -> Unit
 ) {
     Column(
@@ -1016,6 +1033,19 @@ fun CardDocumentSection(
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold
                 )
+            }
+        }
+
+        if (onSwapSides != null) {
+            OutlinedButton(
+                onClick = onSwapSides,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Icon(Icons.Default.SwapVert, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Swap Front & Back Sides", fontWeight = FontWeight.Bold)
             }
         }
 
