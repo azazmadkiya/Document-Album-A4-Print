@@ -66,10 +66,6 @@ fun EditorScreen(
     val panBack by viewModel.panBack.collectAsState()
     val voterFront by viewModel.voterFront.collectAsState()
     val voterBack by viewModel.voterBack.collectAsState()
-    val dlFront by viewModel.dlFront.collectAsState()
-    val dlBack by viewModel.dlBack.collectAsState()
-    val studentFront by viewModel.studentFront.collectAsState()
-    val studentBack by viewModel.studentBack.collectAsState()
     val coverFront by viewModel.coverFront.collectAsState()
     val coverBack by viewModel.coverBack.collectAsState()
 
@@ -435,10 +431,6 @@ fun EditorScreen(
                     "PAN_BACK" -> viewModel.setPanBack(editedUri)
                     "VOTER_FRONT" -> viewModel.setVoterFront(editedUri)
                     "VOTER_BACK" -> viewModel.setVoterBack(editedUri)
-                    "DL_FRONT" -> viewModel.setDlFront(editedUri)
-                    "DL_BACK" -> viewModel.setDlBack(editedUri)
-                    "STUDENT_FRONT" -> viewModel.setStudentFront(editedUri)
-                    "STUDENT_BACK" -> viewModel.setStudentBack(editedUri)
                     "COVER_FRONT" -> viewModel.setCoverFront(editedUri)
                     "COVER_BACK" -> viewModel.setCoverBack(editedUri)
                 }
@@ -503,24 +495,12 @@ fun EditorScreen(
                 Tab(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
-                    icon = { Icon(Icons.Default.DriveFileRenameOutline, contentDescription = null, modifier = Modifier.size(18.dp)) },
-                    text = { Text("Driving License") }
-                )
-                Tab(
-                    selected = selectedTab == 4,
-                    onClick = { selectedTab = 4 },
-                    icon = { Icon(Icons.Default.School, contentDescription = null, modifier = Modifier.size(18.dp)) },
-                    text = { Text("Student/Employee") }
-                )
-                Tab(
-                    selected = selectedTab == 5,
-                    onClick = { selectedTab = 5 },
                     icon = { Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(18.dp)) },
                     text = { Text("Cover Photo") }
                 )
                 Tab(
-                    selected = selectedTab == 6,
-                    onClick = { selectedTab = 6 },
+                    selected = selectedTab == 4,
+                    onClick = { selectedTab = 4 },
                     icon = { Icon(Icons.Default.Print, contentDescription = null, modifier = Modifier.size(18.dp)) },
                     text = { Text("A4 Album Studio") }
                 )
@@ -701,106 +681,6 @@ fun EditorScreen(
                 }
                 3 -> {
                     CardDocumentSection(
-                        cardName = "Driving License",
-                        frontUri = dlFront,
-                        backUri = dlBack,
-                        onPickFront = { launchGallery("DL_FRONT") },
-                        onCaptureFront = { launchCamera("DL_FRONT") },
-                        onEditFront = {
-                            if (dlFront != null) {
-                                pendingImageUri = dlFront
-                                editingSlot = "DL_FRONT"
-                                startInCropMode = true
-                            }
-                        },
-                        onRotateFront = {
-                            dlFront?.let { uri ->
-                                rotateImageUri(uri)?.let {
-                                    viewModel.setDlFront(it)
-                                    Toast.makeText(context, "Rotated 90°", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        },
-                        onClearFront = { viewModel.setDlFront(null) },
-                        onPickBack = { launchGallery("DL_BACK") },
-                        onCaptureBack = { launchCamera("DL_BACK") },
-                        onEditBack = {
-                            if (dlBack != null) {
-                                pendingImageUri = dlBack
-                                editingSlot = "DL_BACK"
-                                startInCropMode = true
-                            }
-                        },
-                        onRotateBack = {
-                            dlBack?.let { uri ->
-                                rotateImageUri(uri)?.let {
-                                    viewModel.setDlBack(it)
-                                    Toast.makeText(context, "Rotated 90°", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        },
-                        onClearBack = { viewModel.setDlBack(null) },
-                        onUploadPdf = { launchPdfPicker("DL") },
-                        pdfErrorState = pdfErrorState,
-                        onSwapSides = {
-                            viewModel.swapDlSides()
-                            Toast.makeText(context, "Front & Back Swapped", Toast.LENGTH_SHORT).show()
-                        },
-                        onNext = { selectedTab = 4 }
-                    )
-                }
-                4 -> {
-                    CardDocumentSection(
-                        cardName = "Student/Employee ID",
-                        frontUri = studentFront,
-                        backUri = studentBack,
-                        onPickFront = { launchGallery("STUDENT_FRONT") },
-                        onCaptureFront = { launchCamera("STUDENT_FRONT") },
-                        onEditFront = {
-                            if (studentFront != null) {
-                                pendingImageUri = studentFront
-                                editingSlot = "STUDENT_FRONT"
-                                startInCropMode = true
-                            }
-                        },
-                        onRotateFront = {
-                            studentFront?.let { uri ->
-                                rotateImageUri(uri)?.let {
-                                    viewModel.setStudentFront(it)
-                                    Toast.makeText(context, "Rotated 90°", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        },
-                        onClearFront = { viewModel.setStudentFront(null) },
-                        onPickBack = { launchGallery("STUDENT_BACK") },
-                        onCaptureBack = { launchCamera("STUDENT_BACK") },
-                        onEditBack = {
-                            if (studentBack != null) {
-                                pendingImageUri = studentBack
-                                editingSlot = "STUDENT_BACK"
-                                startInCropMode = true
-                            }
-                        },
-                        onRotateBack = {
-                            studentBack?.let { uri ->
-                                rotateImageUri(uri)?.let {
-                                    viewModel.setStudentBack(it)
-                                    Toast.makeText(context, "Rotated 90°", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        },
-                        onClearBack = { viewModel.setStudentBack(null) },
-                        onUploadPdf = { launchPdfPicker("STUDENT") },
-                        pdfErrorState = pdfErrorState,
-                        onSwapSides = {
-                            viewModel.swapStudentSides()
-                            Toast.makeText(context, "Front & Back Swapped", Toast.LENGTH_SHORT).show()
-                        },
-                        onNext = { selectedTab = 5 }
-                    )
-                }
-                5 -> {
-                    CardDocumentSection(
                         cardName = "Cover Photo",
                         frontUri = coverFront,
                         backUri = coverBack,
@@ -844,10 +724,10 @@ fun EditorScreen(
                             viewModel.swapCoverSides()
                             Toast.makeText(context, "Front & Back Swapped", Toast.LENGTH_SHORT).show()
                         },
-                        onNext = { selectedTab = 6 }
+                        onNext = { selectedTab = 4 }
                     )
                 }
-                6 -> {
+                4 -> {
                     A4AlbumStudioSection(
                         title = title,
                         aadhaarFront = aadhaarFront,
@@ -882,10 +762,6 @@ fun EditorScreen(
                                 panBackUri = panBack,
                                 voterFrontUri = voterFront,
                                 voterBackUri = voterBack,
-                                dlFrontUri = dlFront,
-                                dlBackUri = dlBack,
-                                studentFrontUri = studentFront,
-                                studentBackUri = studentBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
                                 layoutStyle = layoutStyle,
@@ -909,10 +785,6 @@ fun EditorScreen(
                                 panBackUri = panBack,
                                 voterFrontUri = voterFront,
                                 voterBackUri = voterBack,
-                                dlFrontUri = dlFront,
-                                dlBackUri = dlBack,
-                                studentFrontUri = studentFront,
-                                studentBackUri = studentBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
                                 layoutStyle = layoutStyle,
@@ -937,10 +809,6 @@ fun EditorScreen(
                                 panBackUri = panBack,
                                 voterFrontUri = voterFront,
                                 voterBackUri = voterBack,
-                                dlFrontUri = dlFront,
-                                dlBackUri = dlBack,
-                                studentFrontUri = studentFront,
-                                studentBackUri = studentBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
                                 layoutStyle = layoutStyle,
@@ -965,10 +833,6 @@ fun EditorScreen(
                                 panBackUri = panBack,
                                 voterFrontUri = voterFront,
                                 voterBackUri = voterBack,
-                                dlFrontUri = dlFront,
-                                dlBackUri = dlBack,
-                                studentFrontUri = studentFront,
-                                studentBackUri = studentBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
                                 layoutStyle = layoutStyle,
@@ -993,10 +857,6 @@ fun EditorScreen(
                                 panBackUri = panBack,
                                 voterFrontUri = voterFront,
                                 voterBackUri = voterBack,
-                                dlFrontUri = dlFront,
-                                dlBackUri = dlBack,
-                                studentFrontUri = studentFront,
-                                studentBackUri = studentBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
                                 layoutStyle = layoutStyle,
@@ -1022,10 +882,6 @@ fun EditorScreen(
                                 panBackUri = panBack,
                                 voterFrontUri = voterFront,
                                 voterBackUri = voterBack,
-                                dlFrontUri = dlFront,
-                                dlBackUri = dlBack,
-                                studentFrontUri = studentFront,
-                                studentBackUri = studentBack,
                                 coverFrontUri = coverFront,
                                 coverBackUri = coverBack,
                                 layoutStyle = layoutStyle,
@@ -1110,7 +966,7 @@ fun EditorScreen(
                         showPreviewDialog = false
                         Toast.makeText(context, "Secured PDF saved with password protection!", Toast.LENGTH_SHORT).show()
                         viewModel.saveDocument {
-                            A4DocumentGenerator.saveA4PdfToStorage(context, previewBitmap!!, "$title (Secured)")
+                            A4DocumentGenerator.saveA4PdfToStorage(context, previewBitmap!!, "$title (Secured)", exportPdfPassword)
                         }
                         exportPdfPassword = ""
                     }

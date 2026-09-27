@@ -402,7 +402,8 @@ object A4DocumentGenerator {
     fun saveA4PdfToStorage(
         context: Context,
         bitmap: Bitmap,
-        title: String
+        title: String,
+        password: String = ""
     ): Uri? {
         val sanitizedTitle = title.ifBlank { "Document_Album" }.replace(Regex("[^a-zA-Z0-9_-]"), "_")
         val filename = "DocAlbum_${sanitizedTitle}_${System.currentTimeMillis()}.pdf"
@@ -427,14 +428,46 @@ object A4DocumentGenerator {
             }
 
             fos?.use { outputStream ->
-                val pdfDoc = android.graphics.pdf.PdfDocument()
-                val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(A4_WIDTH_PX, A4_HEIGHT_PX, 1).create()
-                val page = pdfDoc.startPage(pageInfo)
-                page.canvas.drawBitmap(bitmap, 0f, 0f, Paint(Paint.FILTER_BITMAP_FLAG))
-                pdfDoc.finishPage(page)
-                pdfDoc.writeTo(outputStream)
-                pdfDoc.close()
-                Toast.makeText(context, "Saved PDF to Documents/Document Album A4 Print!", Toast.LENGTH_LONG).show()
+                if (password.isNotBlank()) {
+                    try {
+                        com.tom_roush.pdfbox.android.PDFBoxResourceLoader.init(context)
+                    } catch (_: Exception) {}
+
+                    val pdDoc = com.tom_roush.pdfbox.pdmodel.PDDocument()
+                    val page = com.tom_roush.pdfbox.pdmodel.PDPage(com.tom_roush.pdfbox.pdmodel.common.PDRectangle(A4_WIDTH_PX.toFloat(), A4_HEIGHT_PX.toFloat()))
+                    pdDoc.addPage(page)
+
+                    val tempFile = File(context.cacheDir, "pdf_img_${System.currentTimeMillis()}.jpg")
+                    val out = FileOutputStream(tempFile)
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out)
+                    out.flush()
+                    out.close()
+
+                    val contentStream = com.tom_roush.pdfbox.pdmodel.PDPageContentStream(pdDoc, page)
+                    val pdImage = com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject.createFromFileByExtension(tempFile, pdDoc)
+                    contentStream.drawImage(pdImage, 0f, 0f, A4_WIDTH_PX.toFloat(), A4_HEIGHT_PX.toFloat())
+                    contentStream.close()
+                    tempFile.delete()
+
+                    val protectionPolicy = com.tom_roush.pdfbox.pdmodel.encryption.StandardProtectionPolicy(password, password, com.tom_roush.pdfbox.pdmodel.encryption.AccessPermission().apply {
+                        setCanPrint(true)
+                        setCanExtractContent(false)
+                    })
+                    protectionPolicy.encryptionKeyLength = 128
+                    pdDoc.protect(protectionPolicy)
+                    pdDoc.save(outputStream)
+                    pdDoc.close()
+                    Toast.makeText(context, "Saved Secured PDF with Password to Documents!", Toast.LENGTH_LONG).show()
+                } else {
+                    val pdfDoc = android.graphics.pdf.PdfDocument()
+                    val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(A4_WIDTH_PX, A4_HEIGHT_PX, 1).create()
+                    val page = pdfDoc.startPage(pageInfo)
+                    page.canvas.drawBitmap(bitmap, 0f, 0f, Paint(Paint.FILTER_BITMAP_FLAG))
+                    pdfDoc.finishPage(page)
+                    pdfDoc.writeTo(outputStream)
+                    pdfDoc.close()
+                    Toast.makeText(context, "Saved PDF to Documents/Document Album A4 Print!", Toast.LENGTH_LONG).show()
+                }
             }
             uri
         } catch (e: Exception) {
