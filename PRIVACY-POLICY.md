@@ -1,4 +1,4 @@
-# Privacy Policy - A4 Document Studio
+# Privacy Policy - Document Album A4 Print
 
 **Last updated:** September 26, 2026
 
