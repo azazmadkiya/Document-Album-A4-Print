@@ -2,7 +2,7 @@
 
 **Last updated:** September 26, 2026
 
-**A4 Document Studio** ("we", "our", or "us") built the A4 Document Studio app as an offline-first utility application. This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information.
+**Document Album A4 Print** ("we", "our", or "us") built the A4 Document Studio app as an offline-first utility application. This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information.
 
 ---
 
