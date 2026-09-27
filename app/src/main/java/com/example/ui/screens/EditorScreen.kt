@@ -143,8 +143,7 @@ fun EditorScreen(
     var pdfPasswordInput by remember { mutableStateOf("") }
     var pendingPasswordProtectedPdfUri by remember { mutableStateOf<Uri?>(null) }
     var pendingPasswordProtectedCardType by remember { mutableStateOf<String?>(null) }
-    var showExportPasswordDialog by remember { mutableStateOf(false) }
-    var exportPdfPassword by remember { mutableStateOf("") }
+
 
     fun processPdfToFrontAndBack(pdfUri: Uri, cardType: String, password: String = "") {
         android.util.Log.i("EditorScreen", "Processing PDF for cardType=$cardType, uri=$pdfUri, hasPassword=${password.isNotEmpty()}")
@@ -921,9 +920,7 @@ fun EditorScreen(
                             A4DocumentGenerator.saveA4BitmapToStorage(context, previewBitmap!!, title)
                         }
                     },
-                    onSecurePdf = {
-                        showExportPasswordDialog = true
-                    }
+
                 )
             }
 
@@ -950,28 +947,7 @@ fun EditorScreen(
                 )
             }
 
-            if (showExportPasswordDialog && previewBitmap != null) {
-                PasswordInputDialog(
-                    title = "Password Protect PDF Export",
-                    subtitle = "Secure your exported A4 PDF document with a password.",
-                    confirmButtonText = "Save Secured PDF",
-                    requireConfirmation = true,
-                    onDismiss = {
-                        showExportPasswordDialog = false
-                        exportPdfPassword = ""
-                    },
-                    onPasswordConfirmed = { password ->
-                        exportPdfPassword = password
-                        showExportPasswordDialog = false
-                        showPreviewDialog = false
-                        Toast.makeText(context, "Secured PDF saved with password protection!", Toast.LENGTH_SHORT).show()
-                        viewModel.saveDocument {
-                            A4DocumentGenerator.saveA4PdfToStorage(context, previewBitmap!!, "$title (Secured)", exportPdfPassword)
-                        }
-                        exportPdfPassword = ""
-                    }
-                )
-            }
+
         }
     }
 }
@@ -1504,35 +1480,15 @@ fun A4AlbumStudioSection(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
-                    .clickable {
-                        uriHandler.openUri("https://azazmadkiya.morbi.store")
-                    }
-                    .padding(vertical = 10.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Developed By Azazmadkiya",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "azazmadkiya.morbi.store",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Developed By Azazmadkiya",
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

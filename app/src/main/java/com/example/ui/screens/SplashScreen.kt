@@ -303,17 +303,12 @@ fun SplashScreen(
                     fontWeight = FontWeight.Medium
                 )
             }
-            val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "Developed By Azazmadkiya\nazazmadkiya.morbi.store",
-                color = Color(0xFF38BDF8),
-                fontSize = 11.5.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 0.5.sp,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                modifier = Modifier.clickable {
-                    uriHandler.openUri("https://azazmadkiya.morbi.store")
-                }
+                text = "Developed By Azazmadkiya",
+                color = Color(0xFF94A3B8),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
